@@ -1,1 +1,112 @@
-//ok google, criar site
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>testes</title>
+  <style>
+    /* Caixa externa da lista */
+    ul.lista-coluna {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-family: sans-serif;
+      border: 1px solid #ccc; /* Borda ao redor de toda a lista */
+      max-width: 300px;       /* Largura da caixinha */
+    }
+
+    /* Cada linha da lista */
+    ul.lista-coluna li {
+      padding: 10px;                 /* Espaço interno para o texto */
+      border-bottom: 1px solid #ccc; /* Linha divisória horizontal */
+      color: #333;
+    }
+
+    /* Remove a linha de baixo do último item */
+    ul.lista-coluna li:last-child {
+      border-bottom: none;
+    }
+
+    /* Linha do topo (Cabeçalho) */
+    ul.lista-coluna li.topo {
+      background-color: #f0f0f0; /* Fundo cinza claro */
+      font-weight: bold;         /* Texto em negrito */
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+            <form id="formulario">
+            <input type="text" id="nomeJogador" placeholder="20Comer70Correr" required>
+
+            <button type="submit">Cadastrar</button>
+            </form>
+            <br><br>
+
+
+
+
+  <ul id="lista" class="lista-coluna">
+    <!-- Cabeçalho -->
+    <li class="topo">Gerenciar Jogadores</li>
+    <li></li>
+  </ul>
+
+<br><br>
+<button onclick="CriarTorneio()">Criar Torneio</button>
+
+  <ul id="selecionarJogador" class="lista-coluna"></ul>
+  <div id="opcoes"></div>
+
+
+  <script>
+const formulario = document.getElementById('formulario');
+const lista = document.getElementById('lista');
+
+let nomes = [];
+
+formulario.addEventListener('submit', function(event) {
+
+    event.preventDefault(); // Impede o recarregamento da página
+
+    const nomeJogador = document.getElementById('nomeJogador').value;
+    nomes.push(nomeJogador); //salva o nome do jogador no array.
+
+    CarregarTabela();
+    formulario.reset();
+});
+
+function CriarTorneio() {
+const listaSelecionar = document.getElementById('selecionarJogador');
+const opcoes = document.getElementById('opcoes');
+
+    listaSelecionar.innerHTML = '<li class="topo">Selecione os Jogadores</li>'; // a lista começa com isso
+    
+    for (let i = 0; i < nomes.length; i++) {
+        let esseNome = nomes[i];
+        let novoItem = document.createElement("li");
+        novoItem.textContent = esseNome;
+
+    novoItem.addEventListener('click', function() {
+    console.log('Você clicou no item!');
+    });
+        listaSelecionar.appendChild(novoItem); 
+    }
+
+    opcoes.innerHTML = '<button>Pronto</burron>';
+}
+
+function CarregarTabela() {
+     lista.innerHTML = '<li class="topo">Jogadores</li>'; // a lista começa com isso
+    
+    for (let i = 0; i < nomes.length; i++) {
+        let esseNome = nomes[i];
+        let novoItem = document.createElement("li");
+        novoItem.textContent = esseNome;
+        lista.appendChild(novoItem); 
+
+    }
+}
+
+</script>
+</body>
+</html>
