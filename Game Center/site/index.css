@@ -1,0 +1,82 @@
+
+@font-face {
+  font-family: 'Ethnocentric';
+  src: url('fonts/Ethnocentric.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+body {
+    background-color: #10002b;
+}
+
+h1 {
+  font-family: 'Ethnocentric', sans-serif;
+  color: blueviolet;
+  font-size: 40px;
+}
+
+.entrar {
+    width: 300px;
+    height: 50px;
+    font-size: 16px; 
+    background-color: #4C43CD;
+    border-radius: 24px;
+    border: none;
+    margin-bottom: 16px;
+    outline: none;
+    color: #e0aaff;
+  }
+
+.entrar::placeholder {
+  color: #e0aaff;
+}
+
+button {
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 100px;
+  background-color: #4C43CD;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  margin: 8px;
+}
+
+button:hover {
+  filter: brightness(1.25);
+  transform: scale(1.03);  
+}
+
+  .quadrado {
+    width: 360px;
+    aspect-ratio: 1 / 1;
+    background: #000000;
+    border: 2px solid #4C43CD;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 24px;
+  }
+
+.ativar-senha {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-70%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.olho {
+  position: relative;
+  display: inline-block;
+  align-items: center;
+}
+
