@@ -1,0 +1,132 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: inherit;
+    text-decoration: none;
+}
+
+body, html {
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "navbar"
+        "main";
+    gap: 2rem;
+    background-color: #0f172a;
+}
+
+.dashboard-container > * {
+    border-radius: 8px;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: #1e293b;
+}
+
+.navbar {
+    height: 5rem;
+    grid-area: navbar;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem;
+    background-color: #1e293b;
+    color: aliceblue;
+}
+
+.image {
+    background-color: red;
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
+.main {
+    grid-area: main;
+    background-color: #1e293b;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    min-width: 0;
+}
+
+.backgroundcarrossel {
+    background-color:rgb(0, 23, 44);
+    width: 100%;
+    padding: 2rem;
+    border-radius: 20px;
+
+}
+
+
+.torneios {
+    display:flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    width: max-content;
+}
+
+.torneiocont, .torneioccont {
+    width: 100%;
+    overflow: hidden;
+}
+
+.torneiocard {
+    display:flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 0 0 480px;
+    border-radius: 20px;
+    background-color:rgb(36, 49, 60);
+    width: 480px;
+    padding: .5rem;
+}
+
+.torneioscomunidade {
+    margin-top: 1rem;
+    background-color: rgb(1, 39, 72);
+    padding: 1rem;
+    width: 100%;
+    border-radius: 20px;
+}
+
+.icontorneio {
+    border-radius: 20px;
+    max-width: 80px;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.nome{
+    padding-top: 10px;
+    padding-left: 20px;
+    color: white;
+}
+
+.fototorneio {
+   width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 20px;;
+}
+
+.torneioc{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    
+}
