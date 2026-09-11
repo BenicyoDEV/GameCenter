@@ -61,9 +61,10 @@
   <br><br><br>
   <ul id="jogadoresSelecionados" class="lista-coluna"></ul>
   <div id="opcoes"></div>
-  <br><br><br>
+  <br><br><br><br><br><br><br><br>
 
   <h2 id="titulo"></h2>
+  <br>
   <div id="rodada"class="rodadaClass"></div>
 
 
@@ -72,9 +73,9 @@
 const formulario = document.getElementById('formulario');
 const lista = document.getElementById('lista');
 
-const jogadoresPorRodada = 0;
+let jogadoresPorRodada;
 
-const jogselecionados = []
+let jogselecionados = []
 let nomes = [];
 
 formulario.addEventListener('submit', function(event) {
@@ -116,7 +117,7 @@ let esseNome = nomes[i];
                           <input
                           id="jogrod"
                           type="text"
-                          placeholder="5"
+                          placeholder="5">
           <br>
       <p>qual o nome do torneio?</p>
                           <input
@@ -138,7 +139,8 @@ let esseNome = nomes[i];
   nomeTorneio.textContent = nomeAtribuido;
 
   const jogrod = document.getElementById('jogrod').value;
-  jogadoresPorRodada = jogrod;
+
+  jogadoresPorRodada = Number(jogrod);
 
   Torneio();
   });
@@ -172,18 +174,27 @@ function Torneio() {
 
 
 const rodada = document.getElementById('rodada');
+let numeroRodada = 1;
+let listaRodada = null;
 
-  if (jogselecionados > jogadoresPorRodada)
-  {
-    for (i = 0; i < jogadoresPorRodada; i++)
+    for (let i = 0; i < jogselecionados.length; i++) 
     {
-        let esseNomeSelecionado = jogselecionados[i];
-        rodada.innerHTML = "<p>${esseNomeSelecionado}</p><br>"
-        jogselecionados.pop();
-        //parei aqui, parte automatica de gerar tabela de quem está no jogo.
-    }
-  }  
 
+        if (i % jogadoresPorRodada === 0)//criar nova lista, selecionar nova lista em listaRodada, aumentar numero da rodada
+        {
+        rodada.innerHTML += `<ul id="listaRodada${numeroRodada}" class="lista-coluna"> </ul><br>`;
+
+        listaRodada = document.getElementById(`listaRodada${numeroRodada}`);
+
+        numeroRodada++;
+        }
+
+        let novoItem = document.createElement("li");
+        novoItem.textContent = jogselecionados[i];
+
+        listaRodada.appendChild(novoItem);
+       
+    }
 
 }
 
