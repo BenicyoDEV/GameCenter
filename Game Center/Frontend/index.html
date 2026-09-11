@@ -35,6 +35,8 @@
   </style>
 </head>
 <body>
+  <h2>Gerenciar Jogadores</h2>
+
             <form id="formulario">
             <input type="text" id="nomeJogador" placeholder="20Comer70Correr" required>
 
@@ -51,17 +53,28 @@
     <li></li>
   </ul>
 
-<br><br>
-<button onclick="CriarTorneio()">Criar Torneio</button>
+<br><br><br><br><br><br><br><br><br><br>
+<h2>Menu Principal</h2>
+<button id="primeiroCriarTorneio" onclick="CriarTorneio()">Criar Torneio</button>
 
   <ul id="selecionarJogador" class="lista-coluna"></ul>
+  <br><br><br>
+  <ul id="jogadoresSelecionados" class="lista-coluna"></ul>
   <div id="opcoes"></div>
+  <br><br><br>
+
+  <h2 id="titulo"></h2>
+  <div id="rodada"class="rodadaClass"></div>
+
 
 
   <script>
 const formulario = document.getElementById('formulario');
 const lista = document.getElementById('lista');
 
+const jogadoresPorRodada = 0;
+
+const jogselecionados = []
 let nomes = [];
 
 formulario.addEventListener('submit', function(event) {
@@ -82,18 +95,98 @@ const opcoes = document.getElementById('opcoes');
     listaSelecionar.innerHTML = '<li class="topo">Selecione os Jogadores</li>'; // a lista começa com isso
     
     for (let i = 0; i < nomes.length; i++) {
-        let esseNome = nomes[i];
-        let novoItem = document.createElement("li");
+let esseNome = nomes[i];
+        let novoItem = document.createElement("button");
+        novoItem.type = "button";
         novoItem.textContent = esseNome;
 
-    novoItem.addEventListener('click', function() {
-    console.log('Você clicou no item!');
-    });
-        listaSelecionar.appendChild(novoItem); 
+        novoItem.addEventListener('click', function() {
+            jogselecionados.push(esseNome);
+            CarregarJogadoresSelecionados();
+            novoItem.disabled = true; 
+        });
+
+        let li = document.createElement("li");
+        li.appendChild(novoItem);
+        listaSelecionar.appendChild(li);
     }
 
-    opcoes.innerHTML = '<button>Pronto</burron>';
+    opcoes.innerHTML = `<form id="confirmarOpcoes">
+      <p>quantos jogadores por rodada?</p>
+                          <input
+                          id="jogrod"
+                          type="text"
+                          placeholder="5"
+          <br>
+      <p>qual o nome do torneio?</p>
+                          <input
+                          id="nomtor"
+                          type="text"
+                          placeholder="torneio legal"
+                          required>
+          <br>
+
+    <button type="submit">Confirmar</button>
+                        </form>`;
+
+  confirmform = document.getElementById('confirmarOpcoes');
+  confirmform.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+  const nomeTorneio = document.getElementById('titulo');
+  const nomeAtribuido = document.getElementById('nomtor').value;
+  nomeTorneio.textContent = nomeAtribuido;
+
+  const jogrod = document.getElementById('jogrod').value;
+  jogadoresPorRodada = jogrod;
+
+  Torneio();
+  });
 }
+
+
+function CarregarJogadoresSelecionados() {
+  const listaSelecionados = document.getElementById('jogadoresSelecionados');
+
+  listaSelecionados.innerHTML = '<li class="topo">Jogadores Selecionados</li>';
+
+  for (let i = 0; i < jogselecionados.length; i++)
+  {
+    let esseNomeSelecionado = jogselecionados[i];
+    let novoItem = document.createElement("li");
+    novoItem.textContent = esseNomeSelecionado;
+    listaSelecionados.appendChild(novoItem);
+
+  }
+}
+
+function Torneio() {
+  /*const listaSelecionados = document.getElementById('jogadoresSelecionados');
+  const listaSelecionar = document.getElementById('selecionarJogador');
+  const opcoes = document.getElementById('opcoes');
+  const btncriar = document.getElementById('primeiroCriarTorneio');
+  listaSelecionados.innerHTML = '';
+  listaSelecionar.innerHTML = '';
+  opcoes.innerHTML = '';
+  btncriar.innerHTML = '';*/
+
+
+const rodada = document.getElementById('rodada');
+
+  if (jogselecionados > jogadoresPorRodada)
+  {
+    for (i = 0; i < jogadoresPorRodada; i++)
+    {
+        let esseNomeSelecionado = jogselecionados[i];
+        rodada.innerHTML = "<p>${esseNomeSelecionado}</p><br>"
+        jogselecionados.pop();
+        //parei aqui, parte automatica de gerar tabela de quem está no jogo.
+    }
+  }  
+
+
+}
+
 
 function CarregarTabela() {
      lista.innerHTML = '<li class="topo">Jogadores</li>'; // a lista começa com isso
