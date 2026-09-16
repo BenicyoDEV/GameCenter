@@ -155,12 +155,37 @@
     <li class="topo">Jogadores</li>
   </ul>
 
+  <br>
+
+  <ul id="listaQuant" class="lista-coluna">
+    <li class="topo">Quantidade Jogadores Cadastrados</li>
+  </ul>
+
+  <br>
+
+  <ul id="listaMais" class="lista-coluna">
+    <li class="topo">Jogador Com Mais Vitórias</li>
+  </ul>
+
+  <br>
+
+  <ul id="listaMenos" class="lista-coluna">
+    <li class="topo">Jogador Com Menos Vitória</li>
+  </ul>
+
+  <br>
+
+  <ul id="listaMedia" class="lista-coluna">
+    <li class="topo">Média de Vitórias por Jogador</li>
+  </ul>
+
+
   <br><br><br><br><br><br><br><br><br><br>
 
   <div id="menu-principal">
     <h2>Menu Principal</h2>
     <button id="primeiroCriarTorneio" onclick="CriarTorneio()">Criar Torneio</button>
-      <div id="areaErro2"> </div>
+    <div id="areaErro2"> </div>
     <br><br>
     <div class="listas-jogadores">
       <div id="lista-selecionar"></div>
@@ -174,12 +199,17 @@
   <br><br><br><br><br><br><br><br><br><br>
 
   <h2 id="titulo"></h2>
+  <div id="areaErro3"> </div>
   <br>
   <div id="rodada"class="rodadaClass"></div>
 
   <script>
     const formulario = document.getElementById('formulario');
     const lista = document.getElementById('lista');
+    const listaQuant = document.getElementById('listaQuant');
+    const listaMais = document.getElementById('listaMais');
+    const listaMenos = document.getElementById('listaMenos');
+    const listaMedia = document.getElementById('listaMedia');
 
     let jogadoresPorRodada;
     const rodada = document.getElementById('rodada');
@@ -188,11 +218,13 @@
     const menuPrincipal = document.getElementById('menu-principal');
     const areaErro = document.getElementById('areaErro');
     const areaErro2 = document.getElementById('areaErro2');
+    const areaErro3 = document.getElementById('areaErro3');
 
     let jogselecionados = []
     let jogAtual = []
     let nomes = [];
     let numeroRodada = 1;
+
 
     const editarJogador = document.getElementById('editarJogador');
 
@@ -207,18 +239,18 @@
     if (nomeJogador == '')
     {
       areaErro.innerHTML = `<p>Nome do jogador vazio.</p>
-                            <button id="fecharErro">Fechar</button>`;
+      <button id="fecharErro">Fechar</button>`;
       document.getElementById("fecharErro").addEventListener("click", function() {
-      areaErro.innerHTML = '';
+        areaErro.innerHTML = '';
       });
       return;
     }
-    else if (nomes.includes(nomeJogador))
+    else if (nomes.some(jogador => jogador.nome === nomeJogador))
     {
       areaErro.innerHTML = `<p>Jogador já existente.</p>
-                            <button id="fecharErro">Fechar</button>`;
+      <button id="fecharErro">Fechar</button>`;
       document.getElementById("fecharErro").addEventListener("click", function() {
-      areaErro.innerHTML = '';
+        areaErro.innerHTML = '';
       });
       return;
     }
@@ -227,7 +259,24 @@
       areaErro.innerHTML = ``;
     }
 
-    nomes.push(nomeJogador); //salva o nome do jogador no array.
+    try {
+      
+      nomes.push(
+      {
+        nome: nomeJogador,
+        vitorias: 0
+      }
+      );
+     //salva o nome do jogador no array.
+    } catch (erro) {
+      areaErro.innerHTML = `<p>Não foi possivel cadastrar o jogador.</p>
+      <button id="fecharErro">Fechar</button>`;
+      document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro.innerHTML = '';
+      });
+    }
+
+
 
     CarregarTabela();
     formulario.reset();
@@ -242,13 +291,24 @@
     listaSelecionar.innerHTML = '<li class="topo">Selecione os Jogadores</li>'; // a lista começa com isso
     
     for (let i = 0; i < nomes.length; i++) {
-      let esseNome = nomes[i];
+      let esseNome = nomes[i].nome;
       let novoItem = document.createElement("button");
       novoItem.type = "button";
       novoItem.textContent = esseNome;
 
       novoItem.addEventListener('click', function() {
-        jogselecionados.push(esseNome);
+
+        try {
+          jogselecionados.push(esseNome);
+        } catch (erro) {
+          areaErro2.innerHTML = `<p>Não foi possivel selecionar o jogador.</p>
+          <button id="fecharErro">Fechar</button>`;
+          document.getElementById("fecharErro").addEventListener("click", function() {
+            areaErro2.innerHTML = '';
+          });
+        }
+        
+
         CarregarJogadoresSelecionados();
         novoItem.disabled = true; 
       });
@@ -289,9 +349,9 @@
     if (jogselecionados.length < 2)
     {
       areaErro2.innerHTML = `<p>Pelo menos 2 Jogadore necessários.</p>
-                            <button id="fecharErro">Fechar</button>`;
+      <button id="fecharErro">Fechar</button>`;
       document.getElementById("fecharErro").addEventListener("click", function() {
-      areaErro2.innerHTML = '';
+        areaErro2.innerHTML = '';
       });
       return;
     }
@@ -308,9 +368,9 @@
     if (nomeAtribuido == '')
     {
       areaErro2.innerHTML = `<p>Nome do torneio vazio.</p>
-                            <button id="fecharErro">Fechar</button>`;
+      <button id="fecharErro">Fechar</button>`;
       document.getElementById("fecharErro").addEventListener("click", function() {
-      areaErro2.innerHTML = '';
+        areaErro2.innerHTML = '';
       });
       return;
     }
@@ -319,15 +379,15 @@
       areaErro2.innerHTML = ``;
     }
 
-        const jogrod = document.getElementById('jogrod').value;
-        jogadoresPorRodada = Number(jogrod);
+    const jogrod = document.getElementById('jogrod').value;
+    jogadoresPorRodada = Number(jogrod);
 
     if (jogadoresPorRodada <= 1)
     {
       areaErro2.innerHTML = `<p>Números de Jogadores por rodada insuficiente.</p>
-                            <button id="fecharErro">Fechar</button>`;
+      <button id="fecharErro">Fechar</button>`;
       document.getElementById("fecharErro").addEventListener("click", function() {
-      areaErro2.innerHTML = '';
+        areaErro2.innerHTML = '';
       });
       return;
     }
@@ -363,9 +423,15 @@
     }
 ///////////////////////////////////////////////////////////
 
-    Torneio();
-
-
+    try {
+      Torneio();
+    } catch (erro) {
+      areaErro2.innerHTML = `<p>Não foi possivel criar o torneio.</p>
+      <button id="fecharErro">Fechar</button>`;
+      document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro2.innerHTML = '';
+      });
+    }
 
 
     menuPrincipal.querySelectorAll('button, input, select, textarea').forEach(function(elemento) {
@@ -449,9 +515,17 @@ function Torneio() {
         if (jogselecionados.length == listasGeradas)
         {
           listasGeradas = 0;
-          Torneio();
+          try {
+           Torneio();
+         } catch (erro) {
+          areaErro3.innerHTML = `<p>Não foi possivel carregar a próxima rodada.</p>
+          <button id="fecharErro">Fechar</button>`;
+          document.getElementById("fecharErro").addEventListener("click", function() {
+            areaErro3.innerHTML = '';
+          });
         }
-      });
+      }
+    });
 
         let li = document.createElement("li");
         li.appendChild(novoItem);
@@ -464,12 +538,39 @@ function Torneio() {
       rodada.innerHTML += `
         <br><br><br>
         <h2>VENCEDOR: ${jogselecionados}</h2>
-        <button id="novoTorneio">Novo Torneio</button>
+        <button id="novoTorneio">Próximo</button>
         <br><br><br>
       `;
 
+      for (i = 0; i<nomes.length; i++)
+      {
+        if (nomes[i].nome === jogselecionados[0])
+        {
+          nomes[i].vitorias++;
+          console.log(nomes[i].vitorias);
+        }
+      }
+      
+
+
       document.getElementById("novoTorneio").addEventListener("click", function() {
-        location.reload();
+        rodada.innerHTML = '';
+        menuPrincipal.querySelectorAll('button, input, select, textarea').forEach(function(elemento) {
+          elemento.disabled = false;
+        });
+
+        espacoLista.innerHTML = '';
+        espacoLista2.innerHTML = '';
+        document.getElementById('opcoes').innerHTML = '';
+        document.getElementById('titulo').innerHTML = '';
+
+        jogselecionados = [];
+        jogAtual = [];
+        numeroRodada = 1;
+
+        CarregarTabela();
+
+
       });
     }
 
@@ -477,15 +578,35 @@ function Torneio() {
 
 
   function CarregarTabela() {
-     lista.innerHTML = '<li class="topo">Jogadores</li>'; // a lista começa com isso
+   listaQuant.innerHTML = '<li class="topo">Quantidade Jogadores Cadastrados</li>';
+   let quantidade = nomes.length;
+   let itemQuant = document.createElement("li");
+   itemQuant.textContent = quantidade;
+   listaQuant.appendChild(itemQuant);
 
+
+   let maiorQuantidade = 0;
+   listaMais.innerHTML = '<li class="topo">Jogador com Mais Vitórias</li>';
+   for (i = 0; i<nomes.length; i++)
+   {
+    if (nomes[i].vitorias > maiorQuantidade)
+    {
+      maiorQuantidade = nomes[i].vitorias;
+      let nomeMaior = nomes[i].nome;
+      listaMais.innerHTML = `<li class="topo">Jogador com Mais Vitórias</li>
+      <li>${nomeMaior}</li>`;
+    }
+  }
+
+
+     lista.innerHTML = '<li class="topo">Jogadores</li>'; // a lista começa com isso
      for (let i = 0; i < nomes.length; i++) {
 
         const indice = i; //id
 
         novoItem = document.createElement("li");
 
-        let esseNome = nomes[i];
+        let esseNome = nomes[i].nome;
         let nome = document.createElement("span");
         nome.textContent = esseNome;
 
@@ -540,15 +661,24 @@ function Torneio() {
 
 
         botaoExcluir.addEventListener('click', function(){
-         nomes.splice(indice, 1);
-         CarregarTabela();
-       })
+          try {
+           nomes.splice(indice, 1);
+         } catch (erro) {
+          areaErro.innerHTML = `<p>Não foi possivel remover o jogador.</p>
+          <button id="fecharErro">Fechar</button>`;
+          document.getElementById("fecharErro").addEventListener("click", function() {
+            areaErro.innerHTML = '';
+          });
+        }
+        
+        CarregarTabela();
+      })
 
         botaoAlterar.addEventListener('click', function(){
 
           editarJogador.innerHTML = `
     <div class="editar-jogador">
-        <p>Alterar informações de <b>${nomes[indice]}</b></p>
+        <p>Alterar informações de <b>${nomes[indice].nome}</b></p>
 
         <form id="formularioAlteracoes">
             <div class="linha">
@@ -581,31 +711,42 @@ function Torneio() {
             let inputNovoNome = document.getElementById("novoNomeJogador").value.trim();
 
 
-    if (inputNovoNome == '')
-    {
-      areaErro.innerHTML = `<p>Nome do jogador vazio.</p>
-                            <button id="fecharErro">Fechar</button>`;
-      document.getElementById("fecharErro").addEventListener("click", function() {
-      areaErro.innerHTML = '';
-      });
-      return;
-    }
-    else if (nomes.includes(inputNovoNome))
-    {
-      areaErro.innerHTML = `<p>Jogador já existente.</p>
-                            <button id="fecharErro">Fechar</button>`;
-      document.getElementById("fecharErro").addEventListener("click", function() {
-      areaErro.innerHTML = '';
-      });
-      return;
-    }
-    else
-    {
-      areaErro.innerHTML = ``;
-    }
+            if (inputNovoNome == '')
+            {
+              areaErro.innerHTML = `<p>Nome do jogador vazio.</p>
+              <button id="fecharErro">Fechar</button>`;
+              document.getElementById("fecharErro").addEventListener("click", function() {
+                areaErro.innerHTML = '';
+              });
+              return;
+            }
+            else if (nomes.some(jogador => jogador.nome === inputNovoNome))
+            {
+              areaErro.innerHTML = `<p>Jogador já existente.</p>
+              <button id="fecharErro">Fechar</button>`;
+              document.getElementById("fecharErro").addEventListener("click", function() {
+                areaErro.innerHTML = '';
+              });
+              return;
+            }
+            else
+            {
+              areaErro.innerHTML = ``;
+            }
+
+            try {
+              nomes[indice].nome = inputNovoNome; 
+            } catch (erro) {
+              areaErro.innerHTML = `<p>Não foi possivel editar o jogador.</p>
+              <button id="fecharErro">Fechar</button>`;
+              document.getElementById("fecharErro").addEventListener("click", function() {
+                areaErro.innerHTML = '';
+              });
+            }
 
 
-            nomes[indice] = inputNovoNome; 
+
+
             editarJogador.innerHTML = '';
             CarregarTabela();
           })
@@ -620,19 +761,9 @@ function Torneio() {
 
 
 /*
-
-try {
-    Torneio();
-} catch (erro) {
-    mensagem.textContent = "Não foi possível criar o torneio.";
-    console.error(erro);
-}
-(minimo 5)
-
+cancelar torneio nn reiniciar pag - 2
 EM GERENCIAR JOGADORES:
-mostrar quantos jogadores cadastrados
-jogador com mais vitorias
-mostrar jogadores em si(+opção de alterar e deletar)
+mostrar número vitórias de jogadores
 média de vitórias por jogador;
 maior número de vitórias;
 menor número de vitórias.
@@ -644,13 +775,10 @@ quantos torneios foram realiados
 posições de jogadores
 
 LOGIN
-
 validação se o login estiver vazio
 
 
-
 estilizar gerenciar jogadores
-
 servidor
 */
 
