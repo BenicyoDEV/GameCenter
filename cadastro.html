@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/perfil.png">
+    <title>Pixel Hub</title>
+
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<header class="topo">
+  <img src="img/user.png" class="logos-perfil">
+</header>
+
+<div class="quadrado">
+     <center><img src="img/login.png" class="login"></center>
+
+    <center>
+<form onsubmit="return validarCadastro()">
+  <input class="entrar" type="text" placeholder="Digite seu usuário" size="25" required> <br>
+  <input class="entrar" type="email" placeholder="Digite seu e-mail" size="25" required> <br>
+  <input class="entrar" type="tel" placeholder="Digite seu telefone" size="25" maxlength="15" required> <br>
+  <input class="entrar" type="date" required> <br>
+
+  <input class="entrar" type="password" placeholder="Digite sua senha" id="senha" size="25" maxlength="10" required>
+  <div class="olho">
+    <img src="img/visualizar.png" class="ativar-senha" onclick="mostrarSenha()"> 
+  </div>
+
+  <button type="submit">CADASTRAR-SE</button>
+</form>
+    </center>
+</div>
+
+<script>
+  function mostrarSenha() {
+    const input = document.getElementById('senha');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function validarCadastro() {
+  window.location.href = 'index.html';
+  return false;
+  }
+</script>
+</body>
+</html>
