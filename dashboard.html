@@ -3,36 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=M+PLUS+U:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <title>Torneios</title>
 
     <link rel="stylesheet" href="dashboard.css">
 </head>
+
 <body>
+
 <div class="dashboard-container">
-        <div class="navbar">
-            <a href="index.html">Voltar</a>
 
-            <div class="image">
-                <p>T</p>
-            </div>
+    <nav class="navbar">
+        <a href="index.html" class="voltar">
+            ← Voltar
+        </a>
+
+        <div class="navbar-title">
+            <span>Torneios</span>
         </div>
-    <div class="main">
-        <div class="backgroundcarrossel">
-        <div class="torneiocont">
-            <div class="torneios" id="torneio">
-            </div>
-            </div>
+
+        <div class="image">
+            <p>T</p>
         </div>
-        <div class="torneioscomunidade">
-            <div class="torneioccont">
-            <div class="torneioc"id="comunidade">
+    </nav>
+
+
+    <main class="main">
+        <section class="section destaque">
+
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">EM DESTAQUE</span>
+                    <h1>Próximos torneios</h1>
+                </div>
             </div>
+
+            <div class="backgroundcarrossel">
+                <div class="torneiocont">
+                    <div class="torneios" id="torneio">
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>    
+        </section>
+        <section class="section comunidade">
+
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">COMUNIDADE</span>
+                    <h2>Torneios da comunidade</h2>
+                    <p>Descubra novas competições criadas pelos jogadores.</p>
+                </div>
+            </div>
+
+            <div class="torneioscomunidade">
+
+                <div class="torneioccont">
+                    <div class="torneioc" id="comunidade">
+                        <!-- Cards adicionados pelo JS -->
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+        <section class="criar-torneio">
+
+            <div class="criar-content">
+                <div>
+                    <span class="section-tag">ORGANIZE SUA COMPETIÇÃO</span>
+                    <h2>Quer criar seu próprio torneio?</h2>
+                    <p>
+                        Crie uma competição e reúna jogadores da comunidade.
+                    </p>
+                </div>
+
+                <a href="criar-torneio.html" class="btn-criar">
+                    <span>＋</span>
+                    Criar torneio
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<script src="dashboard.js"></script>
+
 </body>
-<script src="dashboard.js"> 
-</script>
-
 </html>

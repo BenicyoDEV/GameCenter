@@ -6,127 +6,581 @@
     text-decoration: none;
 }
 
-body, html {
-    overflow-x: hidden;
+@font-face {
+    font-family: 'Ethnocentric';
+    src: url('fonts/Ethnocentric.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
 }
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    background: #050308;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+}
+
+
 
 .dashboard-container {
     min-height: 100dvh;
+
     display: grid;
+
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 5rem 1fr;
+
     grid-template-areas:
         "navbar"
         "main";
-    gap: 2rem;
-    background-color: #0f172a;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(76, 67, 205, 0.14),
+            transparent 40%
+        ),
+        #050308;
 }
 
-.dashboard-container > * {
-    border-radius: 8px;
-}
 
-.sidebar {
-    grid-area: sidebar;
-    background-color: #1e293b;
-}
+
 
 .navbar {
-    height: 5rem;
     grid-area: navbar;
+
+    height: 5rem;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 2rem;
-    background-color: #1e293b;
-    color: aliceblue;
+
+    padding: 0 2.5rem;
+
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    background: rgba(5, 3, 8, 0.85);
+    backdrop-filter: blur(14px);
+
+    border-bottom: 1px solid rgba(126, 91, 255, 0.18);
+
+    box-shadow:
+        0 4px 25px rgba(0, 0, 0, 0.45);
 }
 
+
+
+.voltar {
+    color: #aaa7b5;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    padding: 0.6rem 0.9rem;
+
+    border-radius: 10px;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.voltar:hover {
+    color: #fff;
+
+    background: rgba(126, 91, 255, 0.1);
+
+    transform: translateX(-3px);
+}
+
+
+/* TITULO */
+
+.navbar-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    font-size: 1.05rem;
+    font-weight: 800;
+
+    letter-spacing: 0.5px;
+}
+
+.navbar-title span {
+    background: linear-gradient(
+        90deg,
+        #ffffff,
+        #a996ff
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+
+
+
 .image {
-    background-color: red;
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 3rem;
+    height: 3rem;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     border-radius: 50%;
-    font-size: 1.7rem;
-    font-weight: 700;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7e5bff,
+            #4c43cd
+        );
+
+    color: #fff;
+
+    font-size: 1.25rem;
+    font-weight: 800;
+
+    border: 2px solid rgba(255, 255, 255, 0.08);
+
+    box-shadow:
+        0 0 20px rgba(76, 67, 205, 0.25);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
+
+.image:hover {
+    transform: scale(1.06);
+
+    box-shadow:
+        0 0 28px rgba(126, 91, 255, 0.4);
+}
+
+
+
 
 .main {
     grid-area: main;
-    background-color: #1e293b;
+
+    width: 100%;
+    max-width: 1500px;
+
+    margin: 0 auto;
+
+    padding: 3rem 2.5rem 4rem;
+
     display: flex;
     flex-direction: column;
-    padding: 2rem;
-    min-width: 0;
+
+    gap: 3rem;
 }
+
+
+
+
+.section {
+    width: 100%;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.25rem;
+}
+
+.section-header h1,
+.section-header h2,
+.criar-content h2 {
+    margin-top: 0.35rem;
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.6px;
+}
+
+.section-header p,
+.criar-content p {
+    margin-top: 0.4rem;
+    color: #8f8b99;
+    font-size: 0.9rem;
+}
+
+
+
+.section-tag {
+    display: inline-block;
+    color: #9c8cff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+
 
 .backgroundcarrossel {
-    background-color:rgb(0, 23, 44);
     width: 100%;
-    padding: 2rem;
-    border-radius: 20px;
 
+    padding: 1.5rem;
+
+    border-radius: 24px;
+    background:
+        radial-gradient(
+            circle at 80% 0%,
+            rgba(126, 91, 255, 0.22),
+            transparent 40%
+        ),
+        linear-gradient(
+            135deg,
+            #09070f,
+            #170b2c
+        );
+
+    border: 1px solid rgba(126, 91, 255, 0.2);
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.4);
+
+    position: relative;
+    overflow: hidden;
 }
 
 
-.torneios {
-    display:flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-    width: max-content;
+/* brilho */
+
+.backgroundcarrossel::before {
+    content: "";
+
+    position: absolute;
+
+    width: 250px;
+    height: 250px;
+
+    top: -150px;
+    right: 10%;
+
+    background: #6a4fdb;
+
+    filter: blur(120px);
+
+    opacity: 0.15;
+
+    pointer-events: none;
 }
 
-.torneiocont, .torneioccont {
+
+
+
+.torneiocont,
+.torneioccont {
     width: 100%;
     overflow: hidden;
 }
 
-.torneiocard {
-    display:flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    flex: 0 0 480px;
-    border-radius: 20px;
-    background-color:rgb(36, 49, 60);
-    width: 480px;
-    padding: .5rem;
+.torneios {
+    display: flex;
+
+    gap: 1.25rem;
+
+    overflow-x: auto;
+
+    width: 100%;
+
+    padding-bottom: 0.5rem;
+
+    scrollbar-width: thin;
+    scrollbar-color: #4c43cd transparent;
 }
 
-.torneioscomunidade {
-    margin-top: 1rem;
-    background-color: rgb(1, 39, 72);
-    padding: 1rem;
-    width: 100%;
-    border-radius: 20px;
+.torneios::-webkit-scrollbar {
+    height: 5px;
 }
+
+.torneios::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.torneios::-webkit-scrollbar-thumb {
+    background: #4c43cd;
+    border-radius: 10px;
+}
+
+
+
+
+.torneiocard {
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.5rem;
+
+    flex: 0 0 460px;
+
+    width: 460px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #111015,
+            #09080c
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.07);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.45);
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.torneiocard:hover {
+    transform: translateY(-5px);
+
+    border-color:
+        rgba(126, 91, 255, 0.55);
+
+    box-shadow:
+        0 15px 35px rgba(76, 67, 205, 0.2);
+}
+
+
+
+
+.fototorneio {
+    width: 100%;
+    height: 230px;
+
+    object-fit: cover;
+
+    border-radius: 19px 19px 0 0;
+
+    transition: transform 0.4s ease;
+}
+
+.torneiocard:hover .fototorneio {
+    transform: scale(1.025);
+}
+
+
+
+.nome {
+    padding: 0.5rem 1rem 1rem;
+
+    color: #fff;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+}
+
+
+
 
 .icontorneio {
-    border-radius: 20px;
+    border-radius: 16px;
+
     max-width: 80px;
     max-height: 120px;
+
     object-fit: contain;
 }
 
-.nome{
-    padding-top: 10px;
-    padding-left: 20px;
-    color: white;
+
+
+
+.torneioscomunidade {
+    width: 100%;
+
+    padding: 1.5rem;
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(16, 11, 24, 0.95),
+            rgba(24, 12, 43, 0.95)
+        );
+
+    border: 1px solid rgba(126, 91, 255, 0.16);
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.35);
 }
 
-.fototorneio {
-   width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 20px;;
-}
+.torneioc {
+    display: grid;
 
-.torneioc{
-    display: flex;
-    flex-direction: row;
+    grid-template-columns:
+        repeat(auto-fill, minmax(280px, 1fr));
+
     gap: 1rem;
-    
+}
+
+
+
+.criar-torneio {
+    width: 100%;
+
+    padding: 1.8rem 2rem;
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #171126,
+            #0b0810
+        );
+
+    border: 1px solid rgba(126, 91, 255, 0.25);
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.35);
+}
+
+.criar-content {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 2rem;
+}
+
+.criar-content h2 {
+    font-size: 1.35rem;
+}
+
+
+/* BOTÃO */
+
+.btn-criar {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 0.5rem;
+
+    padding: 0.85rem 1.4rem;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7e5bff,
+            #4c43cd
+        );
+
+    color: white;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 7px 20px rgba(76, 67, 205, 0.3);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+.btn-criar span {
+    font-size: 1.2rem;
+}
+
+.btn-criar:hover {
+    transform: translateY(-2px);
+
+    filter: brightness(1.1);
+
+    box-shadow:
+        0 10px 28px rgba(126, 91, 255, 0.4);
+}
+
+.btn-criar:active {
+    transform: translateY(0);
+}
+
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 800px) {
+
+    .navbar {
+        padding: 0 1rem;
+    }
+
+    .main {
+        padding: 2rem 1rem 3rem;
+    }
+
+    .torneiocard {
+        flex-basis: 85vw;
+        width: 85vw;
+    }
+
+    .criar-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-criar {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .navbar-title {
+        display: none;
+    }
+
+    .backgroundcarrossel,
+    .torneioscomunidade {
+        padding: 1rem;
+    }
+
+    .torneioc {
+        grid-template-columns: 1fr;
+    }
+
+    .fototorneio {
+        height: 190px;
+    }
+
+    .criar-torneio {
+        padding: 1.4rem;
+    }
 }

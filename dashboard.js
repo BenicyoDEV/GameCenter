@@ -19,12 +19,18 @@ const torneios = document.getElementById("torneio");
                 </div>
             `;
         }
+    
 
     let posicao = 0;
     function move() {
-        posicao -= 1;
-        torneios.style.transform = `translateX(${posicao}px)`;
-        comunidade.style.transform = `translateX(${posicao}px)`;
+        posicao -= vel;
+        const largcomunidade = comunidade.scrollWidth / 2;
+
+        
+        const poscomunidade = posicao % largcomunidade;
+
+        torneios.style.transform = `translateX(${postorneios}px)`;
+        comunidade.style.transform = `translateX(${poscomunidade}px)`;
         requestAnimationFrame(move)
     }
 
