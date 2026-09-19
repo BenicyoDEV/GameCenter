@@ -154,9 +154,32 @@
       gap: 5px;
   }
 
+.card-torneio {
+    width: 350px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    box-sizing: border-box;
+}
 
+.card-torneio h2 {
+    margin-top: 0;
+}
 
+.classificacao {
+    margin-top: 20px;
+}
 
+.classificacao h3 {
+    margin-bottom: 10px;
+}
+
+.jogador-classificacao {
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+}
 
     </style>
   </head>
@@ -233,13 +256,20 @@
     </div>
 
 
-
     <br><br><br><br><br><br><br><br><br><br>
 
     <h2 id="titulo"></h2>
       <div id="areaErro3"> </div>
     <br>
     <div id="rodada"class="rodadaClass"></div>
+
+
+        <br><br><br><br><br><br><br><br><br><br>
+
+    <h2>Histórico de Torneios</h2>
+
+<div id="espaco-historico"></div>
+
 
     <script>
       
@@ -263,6 +293,10 @@
       const inPesJog = document.getElementById('inPesJog');
       const inFilJog = document.getElementById('inFilJog');
 
+      const criarTorneio = document.getElementById('primeiroCriarTorneio');
+
+      const espacoHistorico = document.getElementById('espaco-historico')
+
       inPesJog.addEventListener('input', function() {
         termoPesquisa = document.getElementById('inPesJog').value;
         termoVitoria = document.getElementById('inFilJog').value;
@@ -278,10 +312,13 @@
       })
       
 
-      let jogselecionados = []
-      let jogAtual = []
+      let jogselecionados = [];
+      let jogAtual = [];
       let nomes = [];
       let numeroRodada = 1;
+
+      let historicoTorneios = [];
+      let classificacaoAtual = [];
 
       let termoPesquisa = "";
       let termoVitoria = "";
@@ -350,6 +387,11 @@
     
 
       function CriarTorneio() {
+criarTorneio.disabled = true;
+
+
+
+
           espacoLista2.innerHTML = `<ul id="listaSelecionados" class="lista-coluna"></ul>`;
     let listaSelecionados = document.getElementById('listaSelecionados');
     listaSelecionados.innerHTML = '<li class="topo">Jogadores Selecionados</li>';
@@ -364,6 +406,7 @@
         let esseNome = nomes[i].nome;
         let novoItem = document.createElement("button");
         novoItem.type = "button";
+        novoItem.id = `selecionar-${esseNome}`;
         novoItem.textContent = esseNome;
 
         novoItem.addEventListener('click', function() {
@@ -493,6 +536,9 @@
       }
   ///////////////////////////////////////////////////////////
 
+
+
+
   try {
       Torneio();
   } catch (erro) {
@@ -530,6 +576,8 @@
 
       botaoRemover.addEventListener('click', function(){
         jogselecionados.splice(indice, 1);
+            let botaoSelecionar = document.getElementById(`selecionar-${esseNomeSelecionado}`);
+    botaoSelecionar.disabled = false;
         CarregarJogadoresSelecionados();
 
 
@@ -594,11 +642,16 @@
             novoItem.className = "jogador-selecionado";
             jogselecionados.push(jogsAtual[i])
 
+
+
             let listaBotaoClicado = novoItem.parentElement.parentElement;
           listaBotaoClicado.querySelectorAll('button').forEach(function(botao) { //querry selector serve para "caçar" um determinado elemento
           botao.disabled = true; //forEach é, "para cada elemeto dessa lista, faça tal coisa."
           listaBotaoClicado.className = "lista-coluna desativado"
 
+          if (botao !== novoItem) {
+          classificacaoAtual.unshift(botao.textContent);
+          }
 
         });
 
@@ -644,7 +697,18 @@
 
 
         document.getElementById("novoTorneio").addEventListener("click", function() {
+
+          let nomeAtribuido = document.getElementById('nomtor').value.trim();
+
+    classificacaoAtual.unshift(jogselecionados[0]);
+    historicoTorneios.push({
+    nome: nomeAtribuido,
+    numRodadas: numeroRodada-1,
+    classificacao: classificacaoAtual
+});
+
         SairTorneio();
+
         });
       }
 
@@ -666,8 +730,13 @@
       jogselecionados = [];
       jogAtual = [];
       numeroRodada = 1;
+      listasGeradas = 0;
+      classificacaoAtual = [];
 
       CarregarTabela();
+
+CarregarHistorico();
+      criarTorneio.disabled = false;
         }
 
 
@@ -885,21 +954,92 @@
       }
 
 
+  function CarregarHistorico() {
 
+
+ /*<div class="card-torneio">
+
+    <h2>Torneio de Brawlhalla</h2>
+
+    <p><strong>Rodadas:</strong> 4</p>
+
+    <div class="classificacao">
+        <h3>Classificação</h3>
+
+        <div class="jogador-classificacao">
+            <span>1º</span>
+            <span>Jogador1</span>
+        </div>
+
+    </div>
+
+</div>
+*/
+    espacoHistorico.innerHTML = '';
+
+for (let i=0; i<historicoTorneios.length; i++)
+{
+let card = document.createElement('div');
+card.className = 'card-torneio';
+
+let nomeTorneioH = document.createElement('h2');
+nomeTorneioH.textContent = historicoTorneios[i].nome;
+
+let numeroDeRodadas = document.createElement('p');
+
+let numeroDeRodadasSpan = document.createElement('strong');
+numeroDeRodadasSpan.textContent = `Rodadas: ${historicoTorneios[i].numRodadas}`;
+
+let classificacao = document.createElement('div');
+classificacao.className = 'classificacao';
+
+
+let tituloClassificacao = document.createElement('h3')
+tituloClassificacao.textContent = 'Classificação';
+classificacao.appendChild(tituloClassificacao);
+
+let numclas = 0;
+for (let j=0; j<historicoTorneios[i].classificacao.length; j++)
+{
+numclas++;
+
+let jogClas = document.createElement('div');
+jogClas.className = 'jogador-classificacao';
+
+let spanClassificacao = document.createElement('span');
+spanClassificacao.textContent = `${numclas}º`;
+
+let spanJogador = document.createElement('span');
+spanJogador.textContent = historicoTorneios[i].classificacao[j];
+
+jogClas.appendChild(spanClassificacao);
+jogClas.appendChild(spanJogador);
+
+
+classificacao.appendChild(jogClas);
+}
+
+
+numeroDeRodadas.appendChild(numeroDeRodadasSpan);
+
+card.appendChild(nomeTorneioH);
+card.appendChild(numeroDeRodadas);
+card.appendChild(classificacao);
+
+
+espacoHistorico.appendChild(card);
+espacoHistorico.innerHTML += `<br>`;
+}
+
+  }
+
+
+CarregarHistorico();
+
+
+
+  
   /*
-  EM GERENCIAR JOGADORES:
-
-  selecionarjog reaparecer botao
-  nao criar dois torneios de uma vez
-
-  EM MENU PRINCIAPAL:
-  scrollar torneios ocorridos
-  quantos torneios foram realiados
-  posições de jogadores
-
-  LOGIN
-  validação se o login estiver vazio
-
   estilizar gerenciar jogadores
   servidor
   */
