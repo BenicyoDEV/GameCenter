@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/perfil.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!--cale=1.0">-->
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=M+PLUS+U:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <title>Menu Principal - Pixel Hub</title>
+
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="dashbord.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <nav class="navbar">
+
+        <div class="navbar-title">
+            <span>Menu Principal</span>
+        </div>
+
+<div class="navbar-actions">
+    <a href="index.html" class="btn-sair">Sair</a>
+    <div class="image">
+        <p>T</p>
+    </div>
+</div>
+    </nav>
+
+
+    <main class="main">
+
+            <div class="main-logo">
+        <img src="img/logo2.png" alt="Pixel Hub">
+            </div>
+
+
+        <section class="section destaque">
+
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">EM DESTAQUE</span>
+                    <h1>Últimos torneios</h1>
+                </div>
+            </div>
+
+            <div class="backgroundcarrossel">
+                <div class="torneiocont">
+                    <div class="torneios" id="torneio">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        </section>
+        <section class="criar-torneio">
+
+            <div class="criar-content">
+                <div>
+                    <span class="section-tag">GERENCIE SEUS JOGADORES</span>
+                    <h2>Deseja cadastrar alguém novo?</h2>
+                    <p>
+                        Cadastre e altere seus jogadores.
+                    </p>
+                </div>
+
+                <a href="gerenciarjogadores.html" class="btn-criar">
+                    Gerenciar Jogadores
+                </a>
+            </div>
+        </section>
+
+
+                <section class="criar-torneio">
+
+            <div class="criar-content">
+                <div>
+                    <span class="section-tag">ORGANIZE SUA COMPETIÇÃO</span>
+                    <h2>Quer criar seu próximo torneio?</h2>
+                    <p>
+                        Crie uma competição entre seus jogadores.
+                    </p>
+                </div>
+
+                <a class="btn-criar">
+                    <span>＋</span>
+                    Criar torneio
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+    const torneios = document.getElementById("torneio");
+    const comunidade = document.getElementById("comunidade");
+    let vel = 1;
+    let pause = false;
+
+        for(let i = 0; i < 30; i++) {
+            torneios.innerHTML += 
+            ` <div class="torneiocard">
+                <img src="img/mkworld.jfif" alt="torneio" class="fototorneio">
+                <p class="nome">Mario Kart World</p>
+                </div>
+            `;
+            }
+
+        for(let i = 0; i < 30; i++) {
+            comunidade.innerHTML += 
+            ` <div class="torneioccard" >
+                    <img src="img/download.jfif" alt="torneio" class="icontorneio">
+                </div>
+            `;
+        }
+    
+
+    let posicao = 0;
+    function move() {
+        posicao -= vel;
+        const largcomunidade = comunidade.scrollWidth / 2;
+
+        
+        const poscomunidade = posicao % largcomunidade;
+
+        torneios.style.transform = `translateX(${postorneios}px)`;
+        comunidade.style.transform = `translateX(${poscomunidade}px)`;
+        requestAnimationFrame(move)
+    }
+
+    move()
+</script>
+
+</body>
+</html>

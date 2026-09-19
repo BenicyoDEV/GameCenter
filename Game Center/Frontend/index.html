@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/perfil.png">
+    <title>Login - Pixel Hub</title>
+
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+
+<body>
+
+<header class="topo">
+  <img src="img/user.png" class="logos-perfil">
+</header>
+
+<div class="quadrado">
+    <center><img src="img/logo2.png" class="ph"></center>
+
+    <center>
+  <input class="entrar" type="text" placeholder="Digite seu usuário"  size="25" maxlength="15"> <br>
+ 
+<div class="campo-senha">
+  <input class="entrar" type="password" placeholder="Digite sua senha" id="senha" size="25" maxlength="10" required>
+  <img src="img/visualizar.png" class="ativar-senha" onclick="mostrarSenha()">
+</div>
+
+<h4>ou continue com:</h4>
+
+<div class="logos">
+  <a href="https://accounts.google.com/signin" target="_blank">
+      <img src="img/google.png" class="logos-perfil">
+  </a>
+  <a href="https://discord.com/login" target="_blank">
+      <img src="img/discord.png" class="logos-perfil">
+  </a>
+  <a href="https://www.roblox.com/pt/login" target="_blank">
+      <img src="img/roblox.png" class="logos-perfil">
+  </a>
+  <a href="https://sso.acesso.gov.br/login" target="_blank">
+      <img src="img/gov.png" class="logos-perfil">
+  </a>
+  <a href="https://store.steampowered.com/login" target="_blank">
+      <img src="img/steam.png" class="logos-perfil">
+  </a>
+</div>
+
+  <a href="menuprincipal.html">
+  <button>LOGIN</button>  
+</a>
+
+  <a href="cadastro.html">
+    <button class="button-cadastro">CADASTRO</button>
+  </a>
+    </center>
+</div>
+
+<script>
+  function mostrarSenha() {
+    const input = document.getElementById('senha');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+</script>
+</body>
+</html>
