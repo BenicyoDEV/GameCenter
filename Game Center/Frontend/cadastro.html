@@ -19,14 +19,15 @@
      <center><img src="img/logo2.png" class="ph"></center>
 
     <center>
-<form onsubmit="return validarCadastro()">
-  <input class="entrar" type="text" placeholder="Nome de usuário" size="25" required> <br>
-  <input class="entrar" type="email" placeholder="Digite seu e-mail" size="25" required> <br>
+<form onsubmit="return validarCadastro(event)">
+  <input class="entrar" type="text" placeholder="Nome de usuário" size="25" required id="nomeUsuario"> <br>
+  <input class="entrar" type="email" placeholder="Digite seu e-mail" size="25" required id="emailUsuario"> <br>
 
 <div class="campo-senha">
-  <input class="entrar" type="password" placeholder="Crie sua senha" id="senha" size="25" maxlength="10" required>
+  <input class="entrar" type="password" placeholder="Crie sua senha" size="25" maxlength="10" id="senhaUsuario" required>
   <img src="img/visualizar.png" class="ativar-senha" onclick="mostrarSenha()">
 </div>
+<p id="areaErro" class="erro-form" role="alert"></p>
 <br>
  <div class="botoes">
   <button type="button" class="button-cadastro" onclick="window.location.href='index.html'">VOLTAR</button>
@@ -38,15 +39,41 @@
 </div>
 
 <script>
+  let usuarios = [];
+  const areaErro = document.getElementById("areaErro");
+
   function mostrarSenha() {
-    const input = document.getElementById('senha');
+    const input = document.getElementById('senhaUsuario');
     input.type = input.type === 'password' ? 'text' : 'password';
   }
 
-  function validarCadastro() {
-  window.location.href = 'index.html';
-  return false;
+  function validarCadastro(event) {
+    event.preventDefault();
+
+    try {
+      const nome = document.getElementById("nomeUsuario").value.trim();
+      const email = document.getElementById("emailUsuario").value.trim();
+      const senha = document.getElementById("senhaUsuario").value;
+
+      if (nome.length < 3) throw new Error("O usuário precisa ter pelo menos 3 caracteres.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Digite um e-mail válido.");
+      if (senha.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
+
+      usuarios.push({ usuario: nome, email: email, senha: senha });
+
+      areaErro.textContent = '';
+      window.location.href = 'menuprincipal.html';
+
+    } catch (erro) {
+      areaErro.textContent = erro.message;
+    }
+
+    return false;
   }
+
+  document.querySelector('form').addEventListener('input', function() {
+    areaErro.textContent = '';
+  });
 </script>
 </body>
 </html>

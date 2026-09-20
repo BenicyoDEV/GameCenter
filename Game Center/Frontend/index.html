@@ -21,13 +21,16 @@
     <center><img src="img/logo2.png" class="ph"></center>
 
     <center>
-  <input class="entrar" type="text" placeholder="Digite seu usuário"  size="25" maxlength="15"> <br>
+      <form id="formLogar">
+  <input class="entrar" type="text" placeholder="Digite seu usuário" id="inUsuario"size="25" maxlength="15"> <br>
  
 <div class="campo-senha">
-  <input class="entrar" type="password" placeholder="Digite sua senha" id="senha" size="25" maxlength="10" required>
+  <input class="entrar" type="password" placeholder="Digite sua senha" id="inSenha" size="25" maxlength="10" required>
   <img src="img/visualizar.png" class="ativar-senha" onclick="mostrarSenha()">
 </div>
-
+   
+<p id="areaErro" class="erro-form" role="alert"></p>
+<br>
 <h4>ou continue com:</h4>
 
 <div class="logos">
@@ -48,9 +51,10 @@
   </a>
 </div>
 
-  <a href="menuprincipal.html">
-  <button>LOGIN</button>  
-</a>
+  <a>
+  <button type="submit">LOGIN</button>  
+  </a>
+ </form>
 
   <a href="cadastro.html">
     <button class="button-cadastro">CADASTRO</button>
@@ -60,9 +64,46 @@
 
 <script>
   function mostrarSenha() {
-    const input = document.getElementById('senha');
+    const input = document.getElementById('inSenha');
     input.type = input.type === 'password' ? 'text' : 'password';
   }
+
+  const formLogar = document.getElementById("formLogar");
+  const areaErro = document.getElementById("areaErro");
+
+  const usuarioCadastrado = {
+    usuario: "mineiro",
+    email: "mineiro@gmail.com",
+    senha: "123456"
+  }
+
+  formLogar.addEventListener('submit', function(event){
+
+    event.preventDefault();
+
+    try {
+      const inUsuario = document.getElementById("inUsuario").value.trim();
+      const inSenha = document.getElementById("inSenha").value;
+
+      if (inUsuario === '') throw new Error("Digite seu usuário.");
+      if (inSenha === '') throw new Error("Digite sua senha.");
+
+      if (inUsuario !== usuarioCadastrado.usuario || inSenha !== usuarioCadastrado.senha)
+      {
+        throw new Error("Usuário ou senha incorretos.");
+      }
+
+      areaErro.textContent = '';
+      window.location.href = "menuprincipal.html";
+
+    } catch (erro) {
+      areaErro.textContent = erro.message;
+    }
+  });
+
+  formLogar.addEventListener('input', function(){
+    areaErro.textContent = '';
+  });
 </script>
 </body>
 </html>

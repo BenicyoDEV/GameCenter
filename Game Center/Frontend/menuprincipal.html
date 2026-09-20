@@ -91,10 +91,10 @@
                     </p>
                 </div>
 
-                <a class="btn-criar">
+                <button class="btn-criar" id="primeiroCriarTorneio" onclick="CriarTorneio()">
                     <span>＋</span>
                     Criar torneio
-                </a>
+                </button>
             </div>
         </section>
 
@@ -102,45 +102,514 @@
 
 </div>
 
+ <div id="menu-principal">
+        <div id="areaErro2"> </div>
+      <br><br>
+      <div class="listas-jogadores">
+        <div id="lista-selecionar"></div>
+        <div id="lista-selecionado"></div>
+      </div>
+      <div id="opcoes"></div>
+    </div>
+
+
+    <h2 id="titulo"></h2>
+      <div id="areaErro3"> </div>
+    <br>
+    <div id="rodada"class="rodadaClass"></div>
+
+
+
 <script>
     const torneios = document.getElementById("torneio");
-    const comunidade = document.getElementById("comunidade");
-    let vel = 1;
-    let pause = false;
 
-        for(let i = 0; i < 30; i++) {
-            torneios.innerHTML += 
-            ` <div class="torneiocard">
-                <img src="img/mkworld.jfif" alt="torneio" class="fototorneio">
-                <p class="nome">Mario Kart World</p>
-                </div>
-            `;
-            }
+      let jogadoresPorRodada;
+      const rodada = document.getElementById('rodada');
+      const espacoLista = document.getElementById('lista-selecionar');
+      const espacoLista2 = document.getElementById('lista-selecionado');
+      const menuPrincipal = document.getElementById('menu-principal');
+      const areaErro2 = document.getElementById('areaErro2');
+      const areaErro3 = document.getElementById('areaErro3');
 
-        for(let i = 0; i < 30; i++) {
-            comunidade.innerHTML += 
-            ` <div class="torneioccard" >
-                    <img src="img/download.jfif" alt="torneio" class="icontorneio">
-                </div>
-            `;
+      const criarTorneio = document.getElementById('primeiroCriarTorneio');
+
+
+      let jogselecionados = [];
+      let jogAtual = [];
+      let nomes = [];
+      let numeroRodada = 1;
+
+      let historicoTorneios = [];
+      let classificacaoAtual = [];
+
+      let listasGeradas = 0;
+
+     nomes.push(
+      {
+          nome: "jogador1",
+          vitorias: 0
+      });
+
+           nomes.push(
+      {
+          nome: "jogador2",
+          vitorias: 0
+      });
+
+           nomes.push(
+      {
+          nome: "jogador3",
+          vitorias: 0
+      });
+
+
+      function CriarTorneio() {
+criarTorneio.disabled = true;
+
+
+
+
+          espacoLista2.innerHTML = `<ul id="listaSelecionados" class="lista-coluna"></ul>`;
+    let listaSelecionados = document.getElementById('listaSelecionados');
+    listaSelecionados.innerHTML = '<li class="topo"><h1>Jogadores Selecionados</h1></li>';
+
+        espacoLista.innerHTML = `<ul id="selecionarJogador" class="lista-coluna"></ul>`
+        const listaSelecionar = document.getElementById('selecionarJogador');
+        const opcoes = document.getElementById('opcoes');
+
+      listaSelecionar.innerHTML = '<li class="topo"><h1>Selecione os Jogadores</h1></li>'; //a lista começa com isso
+      
+      for (let i = 0; i < nomes.length; i++) {
+        let esseNome = nomes[i].nome;
+        let novoItem = document.createElement("button");
+        novoItem.type = "button";
+        novoItem.id = `selecionar-${esseNome}`;
+        novoItem.textContent = esseNome;
+
+        novoItem.addEventListener('click', function() {
+
+      try {
+          jogselecionados.push(esseNome);
+  } catch (erro) {
+        areaErro2.innerHTML = `<p>Não foi possivel selecionar o jogador.</p>
+                              <button id="fecharErro">Fechar</button>`;
+        document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro2.innerHTML = '';
+        });
+  }
+          
+
+          CarregarJogadoresSelecionados();
+          novoItem.disabled = true; 
+        });
+
+        let li = document.createElement("li");
+        li.appendChild(novoItem);
+        listaSelecionar.appendChild(li);
+      }
+
+      opcoes.innerHTML = `<form id="confirmarOpcoes">
+        <p><h3>Jogadores por Rodada</h3></p>
+                            <input
+                            id="jogrod"
+                            type="number"
+                            placeholder="2"
+                            >
+            <br>
+        <p><h3>Nome do Torneio</h3></p>
+                            <input
+                            id="nomtor"
+                            type="text"
+                            placeholder="Torneio Legal"
+                            required>
+            <br><br>
+
+      <button type="submit">Confirmar</button>
+      <button id="cancelarform" type="button">Cancelar</button>
+    </form>`;
+
+    cancelarform = document.getElementById('cancelarform');
+    cancelarform.addEventListener('click', function(){
+      SairTorneio();
+    })
+
+    confirmform = document.getElementById('confirmarOpcoes');
+    confirmform.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      if (jogselecionados.length < 2)
+      {
+        areaErro2.innerHTML = `<p>Pelo menos 2 Jogadore necessários.</p>
+                              <button id="fecharErro">Fechar</button>`;
+        document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro2.innerHTML = '';
+        });
+        return;
+      }
+      else
+      {
+        areaErro2.innerHTML = ``;
+      }
+
+
+
+      const nomeAtribuido = document.getElementById('nomtor').value.trim();
+      
+
+      if (nomeAtribuido == '')
+      {
+        areaErro2.innerHTML = `<p>Nome do torneio vazio.</p>
+                              <button id="fecharErro">Fechar</button>`;
+        document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro2.innerHTML = '';
+        });
+        return;
+      }
+      else
+      {
+        areaErro2.innerHTML = ``;
+      }
+
+          const jogrod = document.getElementById('jogrod').value;
+          jogadoresPorRodada = Number(jogrod);
+
+      if (jogadoresPorRodada <= 1)
+      {
+        areaErro2.innerHTML = `<p>Números de Jogadores por rodada insuficiente.</p>
+                              <button id="fecharErro">Fechar</button>`;
+        document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro2.innerHTML = '';
+        });
+        return;
+      }
+      else
+      {
+        areaErro2.innerHTML = ``;
+      }
+
+
+
+
+
+      const nomeTorneio = document.getElementById('titulo');
+      nomeTorneio.textContent = nomeAtribuido;
+
+
+      const cancelarTorneio = document.createElement('button');
+      cancelarTorneio.type = 'button';
+      cancelarTorneio.textContent = 'Cancelar Torneio';
+      cancelarTorneio.className = 'botao-cancelar';
+
+      cancelarTorneio.addEventListener('click', function() {
+        SairTorneio();
+      });
+
+      rodada.appendChild(cancelarTorneio);
+
+
+  //////////////////////////////////////////////////////////// EMBARALHA O ARRAY
+      for (let i = jogselecionados.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [jogselecionados[i], jogselecionados[j]] = [jogselecionados[j], jogselecionados[i]];
+      }
+  ///////////////////////////////////////////////////////////
+
+
+
+
+  try {
+      Torneio();
+  } catch (erro) {
+        areaErro2.innerHTML = `<p>Não foi possivel criar o torneio.</p>
+                              <button id="fecharErro">Fechar</button>`;
+        document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro2.innerHTML = '';
+        });
+  }
+
+
+      menuPrincipal.querySelectorAll('button, input, select, textarea').forEach(function(elemento) {
+        elemento.disabled = true;
+      });
+
+    });
+
+  }
+
+
+  function CarregarJogadoresSelecionados() {
+
+    espacoLista2.innerHTML = `<ul id="listaSelecionados" class="lista-coluna"></ul>`;
+    let listaSelecionados = document.getElementById('listaSelecionados');
+    listaSelecionados.innerHTML = '<li class="topo"><h1>Jogadores Selecionados</h1></li>';
+
+    for (let i = 0; i < jogselecionados.length; i++)
+    {
+      let esseNomeSelecionado = jogselecionados[i];
+      const indice = i;
+
+      let botaoRemover = document.createElement("button");
+      botaoRemover.type = 'button';
+      botaoRemover.textContent = 'Remover';
+
+      botaoRemover.addEventListener('click', function(){
+        jogselecionados.splice(indice, 1);
+            let botaoSelecionar = document.getElementById(`selecionar-${esseNomeSelecionado}`);
+    botaoSelecionar.disabled = false;
+        CarregarJogadoresSelecionados();
+
+
+      })
+
+      let nomeSelecionado = document.createElement("div");
+      nomeSelecionado.textContent = esseNomeSelecionado;
+
+      let novoItem = document.createElement("li");
+      novoItem.appendChild(nomeSelecionado);
+      novoItem.appendChild(botaoRemover);
+      novoItem.className = 'li-gerenciar';
+
+      listaSelecionados.appendChild(novoItem);
+
+
+
+    }
+  }
+
+
+
+  function Torneio() {
+
+
+    if (jogselecionados.length != 1)
+    {
+      let listaRodada = null;
+
+
+      jogsAtual = jogselecionados;
+
+
+
+      jogselecionados = [];
+
+      for (let i = 0; i < jogsAtual.length; i++)
+      {
+
+          if (i % jogadoresPorRodada === 0)//criar nova lista, selecionar nova lista em listaRodada, aumentar numero da rodada
+          {
+
+            listaRodada = document.createElement('ul');
+            listaRodada.id = `listaRodada${numeroRodada}`;
+            listaRodada.className = "lista-coluna";
+            listaRodada.innerHTML = `<li class="topo">Rodada ${numeroRodada} - Selecione o vencedor</li>`;
+            listasGeradas++;
+
+            rodada.appendChild(listaRodada);
+            rodada.appendChild(document.createElement('br'));
+
+            numeroRodada++;
+          }
+
+
+          let novoItem = document.createElement("button");
+          novoItem.type = "button";
+          novoItem.textContent = jogsAtual[i];
+
+          novoItem.addEventListener('click', function() {
+            novoItem.disabled = true;
+            novoItem.className = "jogador-selecionado";
+            jogselecionados.push(jogsAtual[i])
+
+
+
+            let listaBotaoClicado = novoItem.parentElement.parentElement;
+          listaBotaoClicado.querySelectorAll('button').forEach(function(botao) { //querry selector serve para "caçar" um determinado elemento
+          botao.disabled = true; //forEach é, "para cada elemeto dessa lista, faça tal coisa."
+          listaBotaoClicado.className = "lista-coluna desativado"
+
+          if (botao !== novoItem) {
+          classificacaoAtual.unshift(botao.textContent);
+          }
+
+        });
+
+          if (jogselecionados.length == listasGeradas)
+          {
+            listasGeradas = 0;
+                              try {
+         Torneio();
+  } catch (erro) {
+        areaErro3.innerHTML = `<p>Não foi possivel carregar a próxima rodada.</p>
+                              <button id="fecharErro">Fechar</button>`;
+        document.getElementById("fecharErro").addEventListener("click", function() {
+        areaErro3.innerHTML = '';
+        });
+  }
+          }
+        });
+
+          let li = document.createElement("li");
+          li.appendChild(novoItem);
+          listaRodada.appendChild(li);
         }
-    
 
-    let posicao = 0;
-    function move() {
-        posicao -= vel;
-        const largcomunidade = comunidade.scrollWidth / 2;
+      }
+      else
+      {
+        rodada.innerHTML += `
+          <br><br><br>
+          <h2 class="fonte">VENCEDOR: ${jogselecionados}</h2>
+          <button id="novoTorneio">Próximo</button>
+          <br><br><br>
+        `;
 
+        for (i = 0; i<nomes.length; i++)
+        {
+          if (nomes[i].nome === jogselecionados[0])
+          {
+            nomes[i].vitorias++;
+            console.log(nomes[i].vitorias);
+          }
+        }
         
-        const poscomunidade = posicao % largcomunidade;
 
-        torneios.style.transform = `translateX(${postorneios}px)`;
-        comunidade.style.transform = `translateX(${poscomunidade}px)`;
-        requestAnimationFrame(move)
+
+        document.getElementById("novoTorneio").addEventListener("click", function() {
+
+          let nomeAtribuido = document.getElementById('nomtor').value.trim();
+
+    classificacaoAtual.unshift(jogselecionados[0]);
+    historicoTorneios.push({
+    nome: nomeAtribuido,
+    numRodadas: numeroRodada-1,
+    classificacao: classificacaoAtual
+});
+
+        SairTorneio();
+
+        });
+      }
+
     }
 
-    move()
-</script>
+
+    
+        function SairTorneio()
+        {
+          rodada.innerHTML = '';
+           menuPrincipal.querySelectorAll('button, input, select, textarea').forEach(function(elemento) {
+        elemento.disabled = false;
+      });
+      espacoLista.innerHTML = '';
+      espacoLista2.innerHTML = '';
+      document.getElementById('opcoes').innerHTML = '';
+      document.getElementById('titulo').innerHTML = '';
+
+      jogselecionados = [];
+      jogAtual = [];
+      numeroRodada = 1;
+      listasGeradas = 0;
+      classificacaoAtual = [];
+
+CarregarHistorico();
+      criarTorneio.disabled = false;
+        }
+
+
+function CarregarHistorico() {
+ 
+    torneios.innerHTML = '';
+ 
+    if (historicoTorneios.length == 0)
+    {
+      let vazio = document.createElement('div');
+      vazio.className = 'torneios-vazio';
+ 
+      let vazioTitulo = document.createElement('strong');
+      vazioTitulo.textContent = 'Nenhum torneio finalizado ainda';
+ 
+      let vazioTexto = document.createElement('p');
+      vazioTexto.textContent = 'Os torneios que você concluir aparecem aqui.';
+ 
+      vazio.appendChild(vazioTitulo);
+      vazio.appendChild(vazioTexto);
+      torneios.appendChild(vazio);
+      return;
+    }
+ 
+    for (let i = historicoTorneios.length - 1; i >= 0; i--)
+    {
+      let torneio = historicoTorneios[i];
+ 
+      let card = document.createElement('article');
+      card.className = 'torneiocard';
+ 
+      let foto = document.createElement('img');
+      foto.className = 'fototorneio';
+      foto.src = torneio.foto || 'img/torneio.png';
+      foto.alt = '';
+ 
+      let conteudo = document.createElement('div');
+      conteudo.className = 'torneio-conteudo';
+ 
+      let topo = document.createElement('div');
+      topo.className = 'torneio-topo';
+ 
+      let nome = document.createElement('h3');
+      nome.className = 'nome';
+      nome.textContent = torneio.nome;
+      nome.title = torneio.nome;
+ 
+      let rodadas = document.createElement('span');
+      rodadas.className = 'torneio-rodadas';
+      rodadas.textContent = torneio.numRodadas == 1 ? '1 rodada' : `${torneio.numRodadas} rodadas`;
+ 
+      topo.appendChild(nome);
+      topo.appendChild(rodadas);
+ 
+      let classificacao = document.createElement('ol');
+      classificacao.className = 'torneio-classificacao';
+ 
+      for (let j = 0; j < torneio.classificacao.length; j++)
+      {
+        let item = document.createElement('li');
+ 
+        let posicao = document.createElement('span');
+        posicao.className = 'pos';
+        posicao.textContent = `${j + 1}º`;
+ 
+        let jogador = document.createElement('span');
+        jogador.className = 'jogador';
+        jogador.textContent = torneio.classificacao[j];
+        jogador.title = torneio.classificacao[j];
+ 
+        item.appendChild(posicao);
+        item.appendChild(jogador);
+        classificacao.appendChild(item);
+      }
+ 
+      conteudo.appendChild(topo);
+      conteudo.appendChild(classificacao);
+ 
+      card.appendChild(foto);
+      card.appendChild(conteudo);
+      torneios.appendChild(card);
+    }
+ 
+  }
+
+
+CarregarHistorico();
+
+
+
+  
+  /*
+  estilizar gerenciar jogadores
+  servidor
+  */
+
+    </script>
 
 </body>
 </html>
