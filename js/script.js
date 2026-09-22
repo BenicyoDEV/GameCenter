@@ -5,6 +5,7 @@
 let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 let nomes = JSON.parse(localStorage.getItem("nomes")) || [];
 let historicoTorneios = JSON.parse(localStorage.getItem("historicoTorneios")) || [];
+let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || [];
 
 const pagina = document.body.dataset.page;
 
@@ -32,11 +33,14 @@ if (pagina === "cadastro")
       if (nome.length < 3) throw new Error("O usuário precisa ter pelo menos 3 caracteres.");
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Digite um e-mail válido.");
       if (senha.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
+      if (usuarios.some(usuario => usuario.email === email)) throw new Error("Este e-mail já está cadastrado.");
 
  usuarios.push({ usuario: nome, email: email, senha: senha });
  localStorage.setItem("usuarios", JSON.stringify(usuarios));
 
       areaErro.textContent = '';
+      usuarioLogado = usuarios.at(-1);
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
       window.location.href = 'menuprincipal.html';
 
     } catch (erro) {
@@ -80,12 +84,14 @@ if (pagina === "login")
       if (inSenha === '') throw new Error("Digite sua senha.");
 
 let usuarioEncontrado = false;
+let indiceEncontrado = -1;
 
 for (let i = 0; i < usuarios.length; i++)
 {
     if (inUsuario === usuarios[i].usuario && inSenha === usuarios[i].senha)
     {
         usuarioEncontrado = true;
+        indiceEncontrado = i;
         break;
     }
 }
@@ -96,6 +102,8 @@ if (!usuarioEncontrado)
 }
 
       areaErro.textContent = '';
+      usuarioLogado = usuarios[indiceEncontrado];
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
       window.location.href = "pages/menuprincipal.html";
 
     } catch (erro) {
@@ -114,13 +122,20 @@ if (!usuarioEncontrado)
 // ================================
 if (pagina === "gerenciarjogadores")
 {
-   
+      const letraUserGe = document.getElementById('letraUserGe');
+    let letraPassada = usuarioLogado.usuario;
+    letraPassada = letraPassada[0];
+    letraUserGe.innerHTML = `${letraPassada}`;
+
+
       const formulario = document.getElementById('formulario');
       const lista = document.getElementById('lista');
       const listaQuant = document.getElementById('listaQuant');
       const listaMais = document.getElementById('listaMais');
       const listaMenos = document.getElementById('listaMenos');
       const listaMedia = document.getElementById('listaMedia');
+      const listaVenceu = document.getElementById('listaVenceu');
+      const listaNVenceu = document.getElementById('listaNVenceu');
  
       const areaErro = document.getElementById('areaErro');
  
@@ -130,14 +145,12 @@ if (pagina === "gerenciarjogadores")
       inPesJog.addEventListener('input', function() {
         termoPesquisa = document.getElementById('inPesJog').value;
         termoVitoria = document.getElementById('inFilJog').value;
-        console.log("foi");
         CarregarTabela();
       })
  
       inFilJog.addEventListener('input', function() {
         termoPesquisa = document.getElementById('inPesJog').value;
         termoVitoria = document.getElementById('inFilJog').value;
-        console.log("foi2");
         CarregarTabela();
       })
       
@@ -220,6 +233,32 @@ if (pagina === "gerenciarjogadores")
        let itemQuant = document.createElement("li");
        itemQuant.textContent = quantidade;
        listaQuant.appendChild(itemQuant);
+
+
+       const listaVenceu = document.getElementById("listaVenceu");
+       const listaNVenceu = document.getElementById("listaNVenceu");
+
+       listaVenceu.innerHTML = '<li class="topo">Jogadores vencedores</li>';
+       listaNVenceu.innerHTML = '<li class="topo">Jogadores não vencedores</li>';
+        for (i = 0; i<nomes.length; i++)
+       {
+        if (nomes[i].vitorias > 0)
+        {
+          let jogadorVenceu = document.createElement("li");
+          let jogadorVenceuNome = document.createElement("p");
+          jogadorVenceuNome.textContent = nomes[i].nome;
+          jogadorVenceu.appendChild(jogadorVenceuNome);
+          listaVenceu.appendChild(jogadorVenceu);
+        }
+        else
+        {
+          let jogadorNVenceu = document.createElement("li");
+          let jogadorNVenceuNome = document.createElement("p");
+          jogadorNVenceuNome.textContent = nomes[i].nome;
+          jogadorNVenceu.appendChild(jogadorNVenceuNome);
+          listaNVenceu.appendChild(jogadorNVenceu);
+        }
+       }
  
  
        let maiorQuantidade = 0;
@@ -260,7 +299,7 @@ if (pagina === "gerenciarjogadores")
         }
        }
  
- 
+  let resultadosEncontrados = 0;
   lista.innerHTML = '';
  
   for (let i = 0; i < nomes.length; i++) {
@@ -294,16 +333,31 @@ if (pagina === "gerenciarjogadores")
       linha.appendChild(colunaNome);
       linha.appendChild(colunaVitorias);
       linha.appendChild(colunaOpcoes);
- 
+
+      linha.addEventListener('mouseover', function() {
+    linha.classList.add('negrito-hover');
+});
+
+linha.addEventListener('mouseout', function() {
+    linha.classList.remove('negrito-hover');
+});
+
+linha.addEventListener('dblclick', function() {
+    linha.classList.toggle('negrito-fixo');
+});
+
+
       if (termoPesquisa == '')
       {
                     if (termoVitoria == '')
                    {
                    lista.appendChild(linha);
+                   resultadosEncontrados++;
                    }
                    else if (termoVitoria == nomes[indice].vitorias)
                    {
                    lista.appendChild(linha);
+                   resultadosEncontrados++;
                    }
       }
       else if (nomes[indice].nome.startsWith(termoPesquisa) == true)
@@ -311,12 +365,24 @@ if (pagina === "gerenciarjogadores")
                    if (termoVitoria == '')
                    {
                    lista.appendChild(linha);
+                   resultadosEncontrados++;
                    }
                    else if (termoVitoria == nomes[indice].vitorias)
                    {
                    lista.appendChild(linha);
+                   resultadosEncontrados++;
                    }
       }
+
+        if (resultadosEncontrados == 0)
+{
+    let linhaVazia = document.createElement("tr");
+    let colunaVazia = document.createElement("td");
+    colunaVazia.colSpan = 3;
+    colunaVazia.textContent = "Nenhum jogador encontrado.";
+    linhaVazia.appendChild(colunaVazia);
+    lista.appendChild(linhaVazia);
+}
  
           botaoExcluir.addEventListener('click', function(){
                     try {
@@ -342,7 +408,7 @@ if (pagina === "gerenciarjogadores")
           <form id="formularioAlteracoes">
               <div class="linha">
                   <p>Novo Nome:</p>
-                  <input id="novoNomeJogador" type="text" id="novoNomeJogador" placeholder="20Molestar70Escapar" required>
+                  <input id="novoNomeJogador" type="text" id="novoNomeJogador" placeholder="Ex.: Jogador Legal" required>
               </div>
  
             <div class=spaceBetween>
@@ -426,6 +492,12 @@ CarregarTabela();
 // ================================
 if (pagina === "criartorneio")
 {
+      const letraUserCr = document.getElementById('letraUserCr');
+    let letraPassada = usuarioLogado.usuario;
+    letraPassada = letraPassada[0];
+    letraUserCr.innerHTML = `${letraPassada}`;
+
+
 
  let jogadoresPorRodada;
     const rodada = document.getElementById('rodada');
@@ -442,27 +514,6 @@ if (pagina === "criartorneio")
     let classificacaoAtual = [];
 
     let listasGeradas = 0;
-
-    // jogadores de exemplo (depois virão do localStorage)
-    /*
-    nomes.push(
-    {
-        nome: "jogador1",
-        vitorias: 0
-    });
-
-    nomes.push(
-    {
-        nome: "jogador2",
-        vitorias: 0
-    });
-
-    nomes.push(
-    {
-        nome: "jogador3",
-        vitorias: 0
-    });
-    */
 
 
     function CriarTorneio() {
@@ -510,14 +561,14 @@ if (pagina === "criartorneio")
                             <input
                             id="jogrod"
                             type="number"
-                            placeholder="2"
+                            placeholder="Ex.: 2"
                             >
             <br>
         <p><h3>Nome do Torneio</h3></p>
                             <input
                             id="nomtor"
                             type="text"
-                            placeholder="Torneio Legal"
+                            placeholder="Ex.: Torneio Legal"
                             required>
             <br><br>
 
@@ -536,7 +587,7 @@ if (pagina === "criartorneio")
 
         if (jogselecionados.length < 2)
         {
-          areaErro2.innerHTML = `<p>Pelo menos 2 Jogadore necessários.</p>
+          areaErro2.innerHTML = `<p>Selecione pelo menos 2 Jogadore Cadastrados.</p>
                                 <button id="fecharErro">Fechar</button>`;
           document.getElementById("fecharErro").addEventListener("click", function() {
             areaErro2.innerHTML = '';
@@ -765,7 +816,6 @@ if (pagina === "criartorneio")
           });
            localStorage.setItem("historicoTorneios", JSON.stringify(historicoTorneios));
 
-          // TODO (localStorage): salvar historicoTorneios e nomes aqui, antes de sair da página
 
           location.reload();
 
@@ -781,8 +831,6 @@ if (pagina === "criartorneio")
       window.location.href = 'menuprincipal.html';
     }
 
-
-    // a página já abre como se o botão "Criar torneio" tivesse sido clicado
     CriarTorneio();
 
 }
@@ -791,18 +839,17 @@ if (pagina === "criartorneio")
 // ================================
 if (pagina === "historicotorneios")
 {
+      const letraUserHi = document.getElementById('letraUserHi');
+    let letraPassada = usuarioLogado.usuario;
+    letraPassada = letraPassada[0];
+    letraUserHi.innerHTML = `${letraPassada}`;
 
  const torneios = document.getElementById("torneio");
 
 
-    // Cada torneio concluído é guardado assim (depois o localStorage vai preencher este array):
-    // historicoTorneios.push({ nome: "Copa Pixel", numRodadas: 3, classificacao: ["jogador1", "jogador2", "jogador3"] });
-
 
     function CarregarHistorico() {
 
-      // Enquanto o array estiver vazio, os cards de exemplo do HTML continuam na tela.
-      // Se você apagar todos eles, aparece a mensagem de "nenhum torneio".
       if (historicoTorneios.length == 0)
       {
         if (torneios.querySelector('.torneiocard') == null)
@@ -897,6 +944,10 @@ if (pagina === "historicotorneios")
 // ================================
 if (pagina === "menuprincipal")
 {
+    const letraUserMe = document.getElementById('letraUserMe');
+    let letraPassada = usuarioLogado.usuario;
+    letraPassada = letraPassada[0];
+    letraUserMe.innerHTML = `${letraPassada}`;
 
     function CarregarHistorico() {
 

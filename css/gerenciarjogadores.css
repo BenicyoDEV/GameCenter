@@ -551,6 +551,11 @@ body {
     background: rgba(126, 91, 255, 0.07);
 }
 
+#tabelaJogadores tbody tr.negrito-hover td,
+#tabelaJogadores tbody tr.negrito-fixo td {
+    font-weight: 800;
+}
+
 /* ---------- BOTÕES DA TABELA ---------- */
 
 .botoes-ex {
