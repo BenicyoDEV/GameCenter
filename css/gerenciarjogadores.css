@@ -124,6 +124,8 @@ body {
     margin: 0;
 }
 
+
+
 /* ---------- RESPONSIVO ---------- */
 
 @media (max-width: 800px) {
@@ -727,21 +729,21 @@ body {
         gap: 0.55rem;
     }
 
-    .btn-sair {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.78rem;
-    }
+.navbar-actions {
+    gap: 0.3rem;
+}
 
-    .image {
-        width: 2.7rem;
-        height: 2.7rem;
-        font-size: 1rem;
-    }
+.btn-sair {
+    padding: 0.35rem 0.40rem;
+    font-size: 0.65rem;
+    border-radius: 8px;
+}
 
-    .painel {
-        padding: 1.15rem;
-        border-radius: 20px;
-    }
+.image {
+    width: 2.15rem;
+    height: 2.15rem;
+    font-size: 0.9rem;
+}
 
     .campo-form {
         flex-direction: column;
@@ -779,5 +781,19 @@ body {
 
     .editar-jogador .spaceBetween button {
         width: 100%;
+    }
+}
+
+@media (max-width: 500px) {
+    .navbar-title {
+        display: none;
+    }
+
+    .backgroundcarrossel {
+        padding: 1rem;
+    }
+
+    .criar-torneio {
+        padding: 1.4rem;
     }
 }
