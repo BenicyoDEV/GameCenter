@@ -373,7 +373,12 @@ linha.addEventListener('dblclick', function() {
                    resultadosEncontrados++;
                    }
       }
-
+    
+ if (resultadosEncontrados == 0)
+{
+    lista.innerHTML = `<tr><td colspan="3"><p>Nenhum jogador encontrado</p></td></tr>`;
+  console.log("1500");
+}
 
  
           botaoExcluir.addEventListener('click', function(){
@@ -476,10 +481,7 @@ linha.addEventListener('dblclick', function() {
         }
       }
   
- if (resultadosEncontrados == 0)
-{
-    lista.innerHTML = `<tr><td colspan="3"><p>Nenhum jogador encontrado</p></td></tr>`;
-}
+
  
 CarregarTabela();
 }
