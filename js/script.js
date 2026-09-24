@@ -391,11 +391,6 @@ linha.addEventListener('dblclick', function() {
            CarregarTabela();
          })
 
-                 if (resultadosEncontrados == 0)
-{
-    lista.innerHTML = `<tr><td><p>Nenhum jogador encontrado</p></td></tr>`;
-}
- 
           botaoAlterar.addEventListener('click', function(){
  
             editarJogador.innerHTML = `
@@ -480,7 +475,11 @@ linha.addEventListener('dblclick', function() {
  
         }
       }
- 
+  
+ if (resultadosEncontrados == 0)
+{
+    lista.innerHTML = `<tr><td colspan="3"><p>Nenhum jogador encontrado</p></td></tr>`;
+}
  
 CarregarTabela();
 }
