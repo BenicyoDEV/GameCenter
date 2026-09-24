@@ -381,7 +381,7 @@ linha.addEventListener('dblclick', function() {
     colunaVazia.colSpan = 3;
     colunaVazia.textContent = "Nenhum jogador encontrado.";
     linhaVazia.appendChild(colunaVazia);
-    lista.appendChild(linhaVazia);
+    lista.innerHTML = `<tr><td><p>Nenhum jogador encontrado</p></td></tr>`;
 }
  
           botaoExcluir.addEventListener('click', function(){
