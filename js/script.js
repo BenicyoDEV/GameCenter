@@ -374,15 +374,7 @@ linha.addEventListener('dblclick', function() {
                    }
       }
 
-        if (resultadosEncontrados == 0)
-{
-    let linhaVazia = document.createElement("tr");
-    let colunaVazia = document.createElement("td");
-    colunaVazia.colSpan = 3;
-    colunaVazia.textContent = "Nenhum jogador encontrado.";
-    linhaVazia.appendChild(colunaVazia);
-    lista.innerHTML = `<tr><td><p>Nenhum jogador encontrado</p></td></tr>`;
-}
+
  
           botaoExcluir.addEventListener('click', function(){
                     try {
@@ -398,6 +390,11 @@ linha.addEventListener('dblclick', function() {
            
            CarregarTabela();
          })
+
+                 if (resultadosEncontrados == 0)
+{
+    lista.innerHTML = `<tr><td><p>Nenhum jogador encontrado</p></td></tr>`;
+}
  
           botaoAlterar.addEventListener('click', function(){
  
