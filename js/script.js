@@ -346,7 +346,7 @@ linha.addEventListener('dblclick', function() {
     linha.classList.toggle('negrito-fixo');
 });
 
-
+  
       if (termoPesquisa == '')
       {
                     if (termoVitoria == '')
@@ -373,14 +373,8 @@ linha.addEventListener('dblclick', function() {
                    resultadosEncontrados++;
                    }
       }
-    
-  }
 
-       if (resultadosEncontrados == 0)
-{
-    lista.innerHTML = `<tr><td colspan="3"><p>Nenhum jogador encontrado</p></td></tr>`;
-  console.log("1500");
-}
+
  
           botaoExcluir.addEventListener('click', function(){
                     try {
@@ -397,6 +391,16 @@ linha.addEventListener('dblclick', function() {
            CarregarTabela();
          })
 
+              
+if (resultadosEncontrados === 0) {
+    lista.innerHTML = `
+        <tr>
+            <td colspan="3">
+                <p>Nenhum jogador encontrado</p>
+            </td>
+        </tr>
+    `;
+}
           botaoAlterar.addEventListener('click', function(){
  
             editarJogador.innerHTML = `
@@ -481,8 +485,7 @@ linha.addEventListener('dblclick', function() {
  
         }
       }
-  
-
+ 
  
 CarregarTabela();
 }
