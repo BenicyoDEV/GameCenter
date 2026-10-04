@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
-const ProdutoDAO = require('./produtoDAO');
+const DAO = require('./dao');
 
 const app = express();
 
@@ -9,21 +9,59 @@ app.use(cors());
 app.use(express.json());
 
 
-// LISTAR PRODUTOS
+// LISTAR JOGADORES E USUÁRIOS
 
-app.get('/produtos', async function(req, res) {
+app.get('/jogadores', async function(req, res) {
 
     try {
 
-        const produtos =
-            await ProdutoDAO.listarProdutos();
+        const jogadores =
+            await DAO.listarJogadores();
 
-        res.json(produtos);
+        res.json(jogadores);
 
     } catch (erro) {
 
         res.status(500).json({
-            erro: 'Erro ao buscar produtos'
+            erro: 'Erro ao buscar Jogador'
+        });
+
+    }
+
+});
+
+app.get('/usuarios', async function(req, res) {
+
+    try {
+
+        const usuarios =
+            await DAO.listarUsuarios();
+
+        res.json(usuarios);
+
+    } catch (erro) {
+
+        res.status(500).json({
+            erro: 'Erro ao buscar Usuario'
+        });
+
+    }
+
+});
+
+app.get('/torneios', async function(req, res) {
+
+    try {
+
+        const torneios =
+            await DAO.listarTorneios();
+
+        res.json(torneios);
+
+    } catch (erro) {
+
+        res.status(500).json({
+            erro: 'Erro ao buscar Torneios'
         });
 
     }
@@ -31,64 +69,91 @@ app.get('/produtos', async function(req, res) {
 });
 
 
-// CADASTRAR PRODUTO
+// CADASTRAR JOGADOR
 
-app.post('/produtos', async function(req, res) {
+app.post('/jogadores', async function(req, res) {
 
     const nome = req.body.nome;
-    const preco = req.body.preco;
-    const estoque = req.body.estoque;
+    const usuariofk = req.body.usuario;
 
     try {
 
-        await ProdutoDAO.cadastrarProduto(
+        await DAO.cadastrarJogador(
             nome,
-            preco,
-            estoque
+            usuariofk
         );
 
         res.json({
-            mensagem: 'Produto cadastrado!'
+            mensagem: 'Jogador cadastrado!'
         });
 
     } catch (erro) {
 
         res.status(500).json({
-            erro: 'Erro ao cadastrar produto'
+            erro: 'Erro ao cadastrar Jogador'
         });
 
     }
 
 });
 
-
-// ALTERAR PRODUTO
-
-app.put('/produtos/:id', async function(req, res) {
-
-    const id = req.params.id;
+app.post('/usuario', async function(req, res) {
 
     const nome = req.body.nome;
-    const preco = req.body.preco;
-    const estoque = req.body.estoque;
+    const usuarioid = req.body.usuarioId
+    const senha = req.body.senha
+    const email = req.body.email
 
     try {
 
-        await ProdutoDAO.alterarProduto(
-            id,
+        await DAO.cadastrarUsuario(
             nome,
-            preco,
-            estoque
+            usuarioid,
+            email,
+            senha
         );
 
         res.json({
-            mensagem: 'Produto alterado!'
+            mensagem: 'Usuario cadastrado!'
         });
 
     } catch (erro) {
 
         res.status(500).json({
-            erro: 'Erro ao alterar produto'
+            erro: 'Erro ao cadastrar Usuario'
+        });
+
+    }
+
+});
+
+app.post('/torneios', async function(req, res) {
+
+    const nome = req.body.nome;
+    const usuariofk = req.body.usuario;
+    const idTorneio = req.body.torneio;
+    const numRodadas = req.body.numRodadas;
+    const classificacao = req.body.classificacao;
+
+
+   try {
+
+        await DAO.cadastrarTorneio(
+            nome,
+            usuariofk,
+            idTorneio,
+            numRodadas,
+            classificacao
+        );
+
+        res.json({
+            mensagem: 'Torneio criado!'
+        });
+
+    } catch (erro) {
+
+        res.status(500).json({
+            erro: 'Erro ao criar torneio'
         });
 
     }
@@ -96,24 +161,55 @@ app.put('/produtos/:id', async function(req, res) {
 });
 
 
-// EXCLUIR PRODUTO
+// ALTERAR JOGADORES
 
-app.delete('/produtos/:id', async function(req, res) {
+app.put('/jogadores/:id', async function(req, res) {
 
-    const id = req.params.id;
+    const usuariofk = req.params.id;
+    const nome = req.body.nome;
+    const idJogador = req.body.idJogador;
 
     try {
 
-        await ProdutoDAO.excluirProduto(id);
+        await DAO.alterarJogador(
+            usuariofk,
+            nome,
+            idJogador
+        );
 
         res.json({
-            mensagem: 'Produto excluído!'
+            mensagem: 'Jogador alterado!'
         });
 
     } catch (erro) {
 
         res.status(500).json({
-            erro: 'Erro ao excluir produto'
+            erro: 'Erro ao alterar jogador'
+        });
+
+    }
+
+});
+
+
+// EXCLUIR JOGADOR
+
+app.delete('/jogadores/:id', async function(req, res) {
+
+    const id = req.params.id;
+
+    try { 
+
+        await DAO.excluirJogador(id);
+
+        res.json({
+            mensagem: 'Jogador excluído!'
+        });
+
+    } catch (erro) {
+
+        res.status(500).json({
+            erro: 'Erro ao excluir jogador'
         });
 
     }

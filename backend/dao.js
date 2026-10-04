@@ -58,30 +58,31 @@ async function cadastrarJogador(nome, fkUsuario) {
 
     const sql = `
         INSERT INTO jogadores
-        (nome, usuario_fk)
+        (nome, fkUsuario)
         VALUES (?, ?)
     `;
 
     await conexao.execute(sql, [
         nome,
-        usuario_fk
+        fkUsuario
     ]);
 
     await conexao.end();
 }
 
-async function cadastrarUsuario(nome, email, senha) {
+async function cadastrarUsuario(nome, usuarioid, email, senha) {
 
     const conexao = await mysql.createConnection(banco);
 
     const sql = `
         INSERT INTO usuario
-        (nome, email, senha)
-        VALUES (?, ?, ?)
+        (nome, usuarioid, email, senha)
+        VALUES (?, ?, ?, ?)
     `;
 
     await conexao.execute(sql, [
         nome,
+        usuarioid,
         email,
         senha
     ]);
@@ -152,28 +153,24 @@ async function alterarJogador(novoNome, idJogador) {
 
 // EXCLUIR PRODUTO
 
-async function excluirProduto(id) {
+async function excluirJogador(idJogador) {
 
     const conexao = await mysql.createConnection(banco);
 
     const sql = `
-        DELETE FROM item_pedido_compra 
-        where cod_produto_fk = ?
+        DELETE FROM torneio
+        where idJogador_fk = ?
     `;
 
         const sql2 = `
-        DELETE FROM item_nota_fiscal 
-        WHERE cod_produto_fk = ?
+        DELETE FROM jogadores 
+        WHERE idJogador = ?
     `;
 
-        const sql3 = `
-        DELETE FROM produto
-        WHERE cod_produto = ?
-    `;
+
 
     await conexao.execute(sql, [id]);
     await conexao.execute(sql2, [id]);
-    await conexao.execute(sql3, [id]);
 
     await conexao.end();
 }
@@ -181,8 +178,13 @@ async function excluirProduto(id) {
 
 
 module.exports = {
-    listarProdutos,
-    cadastrarProduto,
-    alterarProduto,
-    excluirProduto
+    listarJogadores,
+    cadastrarJogador,
+    alterarJogador,
+    excluirJogador,
+    listarUsuarios,
+    cadastrarUsuario,
+    listarTorneios,
+    cadastrarTorneio,
+    atualizarHistorico
 };
