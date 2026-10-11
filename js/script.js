@@ -1,15 +1,10 @@
-//usuario fk vai vir do usuário logado
-
-
-
-
 // ================================
 // DADOS / LOCALSTORAGE
 // ================================
 
-let usuarios =  [];
-let nomes =  [];
-let historicoTorneios =  [];
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+let nomes = JSON.parse(localStorage.getItem("nomes")) || [];
+let historicoTorneios = JSON.parse(localStorage.getItem("historicoTorneios")) || [];
 let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || [];
 
 const pagina = document.body.dataset.page;
@@ -19,10 +14,6 @@ const pagina = document.body.dataset.page;
 // ================================
 if (pagina === "cadastro")
 {
-  async function carregarUsuarios() {
-  const resposta = await fetch('http://localhost:3000/usuarios');
-  usuarios = await resposta.json();
-}
 
   const areaErro = document.getElementById("areaErro");
 
@@ -31,55 +22,21 @@ if (pagina === "cadastro")
     input.type = input.type === 'password' ? 'text' : 'password';
   }
 
-  async function validarCadastro(event) {
+  function validarCadastro(event) {
     event.preventDefault();
 
     try {
       const nome = document.getElementById("nomeUsuario").value.trim();
       const email = document.getElementById("emailUsuario").value.trim();
       const senha = document.getElementById("senhaUsuario").value;
-       const usuarioId = function(){
-        return Date.now().toString(36) + Math.random().toString(36).substr(2)
-
-        
-    }
-    const id = parseInt(usuarioId)
-    console.log(usuarioId())
-
-      await carregarUsuarios();
 
       if (nome.length < 3) throw new Error("O usuário precisa ter pelo menos 3 caracteres.");
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Digite um e-mail válido.");
       if (senha.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
       if (usuarios.some(usuario => usuario.email === email)) throw new Error("Este e-mail já está cadastrado.");
 
- usuarios.push({ usuario: nome, email: email, senha: senha, id: id});
-
-
- await fetch(
-                'http://localhost:3000/usuario',
-                {
-
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
-
-                    body: JSON.stringify({
-
-                        nome: nome,
-                        email: email,
-                        senha: senha,
-                        id: id
-
-                    })
-
-                }
-
-            )
- //localStorage.setItem("usuarios", JSON.stringify(usuarios));
+ usuarios.push({ usuario: nome, email: email, senha: senha });
+ localStorage.setItem("usuarios", JSON.stringify(usuarios));
 
       areaErro.textContent = '';
       usuarioLogado = usuarios.at(-1);
@@ -113,7 +70,7 @@ if (pagina === "login")
   const areaErro = document.getElementById("areaErro");
 
 
-  formLogar.addEventListener('submit', async function(event){
+  formLogar.addEventListener('submit', function(event){
 
     event.preventDefault();
 
@@ -125,9 +82,6 @@ if (pagina === "login")
 
       if (inUsuario === '') throw new Error("Digite seu usuário.");
       if (inSenha === '') throw new Error("Digite sua senha.");
-
-      const resposta = await fetch('http://localhost:3000/usuarios');
-      usuarios = await resposta.json();
 
 let usuarioEncontrado = false;
 let indiceEncontrado = -1;
@@ -149,8 +103,7 @@ if (!usuarioEncontrado)
 
       areaErro.textContent = '';
       usuarioLogado = usuarios[indiceEncontrado];
-
-      //localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
       window.location.href = "pages/menuprincipal.html";
 
     } catch (erro) {
@@ -169,13 +122,6 @@ if (!usuarioEncontrado)
 // ================================
 if (pagina === "gerenciarjogadores")
 {
-
-  async function carregarJogadores() {
-  const resposta = await fetch('http://localhost:3000/jogadores');
-  nomes = await resposta.json();
-}
-
-
       const letraUserGe = document.getElementById('letraUserGe');
     let letraPassada = usuarioLogado.usuario;
     letraPassada = letraPassada[0];
@@ -216,7 +162,7 @@ if (pagina === "gerenciarjogadores")
  
       const editarJogador = document.getElementById('editarJogador');
  
-      formulario.addEventListener('submit', async function(event) {
+      formulario.addEventListener('submit', function(event) {
  
       event.preventDefault(); // Impede o recarregamento da página
  
@@ -246,52 +192,15 @@ if (pagina === "gerenciarjogadores")
       }
  
       try {
-        
-        const jogadorId = function(){
-        return Date.now().toString(36) + Math.random().toString(36).substr(2) 
-        }
-        const id = parseInt(jogadorId())
-        
-
+          
           nomes.push(
       {
           nome: nomeJogador,
-          vitorias: 0,
-          idJogador: id
+          vitorias: 0
       }
           );
-       //localStorage.setItem("nomes", JSON.stringify(nomes));
+       localStorage.setItem("nomes", JSON.stringify(nomes));
        //salva o nome do jogador no array.
-        
-       const resposta = await fetch(
-                'http://localhost:3000/jogadores',
-                {
-
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
-
-                    body: JSON.stringify({
-
-                        nome: nomeJogador,
-                        vitorias: 0,
-                        idJogador: id
-
-                    })
-
-                }
-
-            )
-
-          if (!resposta.ok) throw new Error();
-
-          await carregarJogadores();
-          
-
-
   } catch (erro) {
         areaErro.innerHTML = `<p>Não foi possivel cadastrar o jogador.</p>
                               <button id="fecharErro">Fechar</button>`;
@@ -299,7 +208,6 @@ if (pagina === "gerenciarjogadores")
         areaErro.innerHTML = '';
         });
   }
-
  
  
  
@@ -468,35 +376,10 @@ linha.addEventListener('dblclick', function() {
 
 
  
-          botaoExcluir.addEventListener('click', async function(){
-                    const idParaExcluir = nomes[indice].idJogador;
+          botaoExcluir.addEventListener('click', function(){
                     try {
          nomes.splice(indice, 1);
-
-         const resposta = await fetch(
-                'http://localhost:3000/jogadores',
-                {
-
-                    method: 'DELETE',
-
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
-
-                    body: JSON.stringify({
-
-                        idJogador: idParaExcluir
-
-                    })
-
-                }
-
-            )
-
-         if (!resposta.ok) throw new Error();
-
-         await carregarJogadores();
+         localStorage.setItem("nomes", JSON.stringify(nomes));
   } catch (erro) {
         areaErro.innerHTML = `<p>Não foi possivel remover o jogador.</p>
                               <button id="fecharErro">Fechar</button>`;
@@ -540,7 +423,7 @@ linha.addEventListener('dblclick', function() {
  
             let confirmarAlteracoes = document.getElementById("confirmarAlteracoes")
  
-            formularioAlteracoes.addEventListener('submit', async function(event) {
+            formularioAlteracoes.addEventListener('submit', function(event) {
               event.preventDefault();
  
               let inputNovoNome = document.getElementById("novoNomeJogador").value.trim();
@@ -571,32 +454,7 @@ linha.addEventListener('dblclick', function() {
  
           try {
           nomes[indice].nome = inputNovoNome;
-
-          const resposta = await fetch(
-                'http://localhost:3000/jogadores',
-                {
-
-                    method: 'PUT',
-
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
-
-                    body: JSON.stringify({
-
-                        idJogador: nomes[indice].idJogador,
-                        nome: inputNovoNome
-
-                    })
-
-                }
-
-            )
-
-          if (!resposta.ok) throw new Error();
-
-          await carregarJogadores();
+          localStorage.setItem("nomes", JSON.stringify(nomes));
   } catch (erro) {
         areaErro.innerHTML = `<p>Não foi possivel editar o jogador.</p>
                               <button id="fecharErro">Fechar</button>`;
@@ -630,24 +488,14 @@ linha.addEventListener('dblclick', function() {
 
       }
  
-
-async function iniciarGerenciarJogadores() {
-  await carregarJogadores();
-  CarregarTabela();
-}
-iniciarGerenciarJogadores();
+ 
+CarregarTabela();
 }
 // ================================
 // CRIAR TORNEIO
 // ================================
 if (pagina === "criartorneio")
 {
-
-  async function carregarJogadores() {
-  const resposta = await fetch('http://localhost:3000/jogadores');
-  nomes = await resposta.json();
-}
-
       const letraUserCr = document.getElementById('letraUserCr');
     let letraPassada = usuarioLogado.usuario;
     letraPassada = letraPassada[0];
@@ -960,7 +808,7 @@ if (pagina === "criartorneio")
         }
 
 
-        document.getElementById("novoTorneio").addEventListener("click", async function() {
+        document.getElementById("novoTorneio").addEventListener("click", function() {
 
           let nomeAtribuido = document.getElementById('nomtor').value.trim();
 
@@ -968,36 +816,9 @@ if (pagina === "criartorneio")
           historicoTorneios.push({
             nome: nomeAtribuido,
             numRodadas: numeroRodada-1,
-            classificacao: classificacaoAtual,
-            usuariofk: usuarioLogado.id
+            classificacao: classificacaoAtual
           });
-            
-
-          await fetch(
-                'http://localhost:3000/torneios',
-                {
-
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
-
-                    body: JSON.stringify({
-
-                        nome: nomeAtribuido,
-                        numRodadas: numeroRodada-1,
-                        classificacao: classificacaoAtual,
-                        usuario: usuarioLogado.id
-
-                    })
-
-                }
-
-            )
-          
-          //localStorage.setItem("historicoTorneios", JSON.stringify(historicoTorneios));
+           localStorage.setItem("historicoTorneios", JSON.stringify(historicoTorneios));
 
 
           location.reload();
@@ -1014,11 +835,7 @@ if (pagina === "criartorneio")
       window.location.href = 'menuprincipal.html';
     }
 
-    async function iniciarCriarTorneio() {
-      await carregarJogadores();
-      CriarTorneio();
-    }
-    iniciarCriarTorneio();
+    CriarTorneio();
 
 }
 // ================================
@@ -1026,12 +843,6 @@ if (pagina === "criartorneio")
 // ================================
 if (pagina === "historicotorneios")
 {
-
-  async function carregarTorneios() {
-  const resposta = await fetch('http://localhost:3000/torneios');
-  historicoTorneios = await resposta.json();
-}
-
       const letraUserHi = document.getElementById('letraUserHi');
     let letraPassada = usuarioLogado.usuario;
     letraPassada = letraPassada[0];
@@ -1129,11 +940,7 @@ if (pagina === "historicotorneios")
     }
 
 
-    async function iniciarHistorico() {
-      await carregarTorneios();
-      CarregarHistorico();
-    }
-    iniciarHistorico();
+    CarregarHistorico();
 
 }
 // ================================
@@ -1145,11 +952,6 @@ if (pagina === "menuprincipal")
     let letraPassada = usuarioLogado.usuario;
     letraPassada = letraPassada[0];
     letraUserMe.innerHTML = `${letraPassada}`;
-
-    async function carregarTorneios() {
-      const resposta = await fetch('http://localhost:3000/torneios');
-      historicoTorneios = await resposta.json();
-    }
 
     function CarregarHistorico() {
 
@@ -1240,10 +1042,7 @@ if (pagina === "menuprincipal")
         }
     }
 
-    async function iniciarMenuPrincipal() {
-      await carregarTorneios();
-      CarregarHistorico();
-    }
-    iniciarMenuPrincipal();
+    CarregarHistorico();
+
 
 }

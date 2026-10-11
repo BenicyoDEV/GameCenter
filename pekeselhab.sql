@@ -1,3 +1,5 @@
+create database pixelhub;
+use pixelhub;
 create table usuario(
     idUsuario int not null primary key auto_increment,
     nome varchar(50) not null,
@@ -20,6 +22,6 @@ create table jogadores(
         nomeTorneio varchar(100) not null,
         quantRodadas int not null,
         classificacao varchar(1000) not null,
-        foreign key (idJogador_fk) references jogadores(idJogador_fk),
+        foreign key (idJogador_fk) references jogadores(idJogador),
         foreign key (idUsuario_fk) references usuario(idUsuario)
     )   engine = InnoDB;
