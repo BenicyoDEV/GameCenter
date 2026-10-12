@@ -2,33 +2,22 @@ const mysql = require('mysql2/promise');
 
 const banco = {
     host: 'localhost',
-    user: 'root',          
+    user: 'root',
     password: 'etecPoa#2026',
     database: 'pixelhub'
 };
 
 
-// LISTAR PRODUTOS
-
-async function listarJogadores() {
-
-    const conexao = await mysql.createConnection(banco);
-
-    const [jogadores] = await conexao.execute(
-        'SELECT * FROM jogadores'
-    );
-
-    await conexao.end();
-
-    return jogadores;
-}
+// ================================
+// USUÁRIOS
+// ================================
 
 async function listarUsuarios() {
 
     const conexao = await mysql.createConnection(banco);
 
     const [usuarios] = await conexao.execute(
-        'SELECT * FROM usuario'
+        'SELECT idUsuario, nome, email FROM usuarios'
     );
 
     await conexao.end();
@@ -36,103 +25,98 @@ async function listarUsuarios() {
     return usuarios;
 }
 
-async function listarTorneios() {
+async function buscarUsuarioPorEmail(email) {
 
     const conexao = await mysql.createConnection(banco);
 
-    const [torneios] = await conexao.execute(
-        'SELECT * FROM torneio'
+    const [usuarios] = await conexao.execute(
+        'SELECT idUsuario, nome, email FROM usuarios WHERE email = ?',
+        [email]
     );
 
     await conexao.end();
 
-    return torneios;
+    return usuarios[0] || null;
 }
 
-
-// CADASTRAR PRODUTO
-
-async function cadastrarJogador(nome, fkUsuario) {
+async function cadastrarUsuario(nome, email, senha) {
 
     const conexao = await mysql.createConnection(banco);
 
     const sql = `
-        INSERT INTO jogadores
-        (nome, fkUsuario)
-        VALUES (?, ?)
+        INSERT INTO usuarios (nome, email, senha)
+        VALUES (?, ?, ?)
     `;
 
-    await conexao.execute(sql, [
+    const [resultado] = await conexao.execute(sql, [
         nome,
-        fkUsuario
-    ]);
-
-    await conexao.end();
-}
-
-async function cadastrarUsuario(nome, usuarioid, email, senha) {
-
-    const conexao = await mysql.createConnection(banco);
-
-    const sql = `
-        INSERT INTO usuario
-        (nome, usuarioid, email, senha)
-        VALUES (?, ?, ?, ?)
-    `;
-
-    await conexao.execute(sql, [
-        nome,
-        usuarioid,
         email,
         senha
     ]);
 
     await conexao.end();
+
+    // devolve o usuário recém-criado, igual ao "usuarios.at(-1)" que o front usava
+    return {
+        idUsuario: resultado.insertId,
+        nome: nome,
+        email: email
+    };
 }
 
-async function cadastrarTorneio(nomeTorneio, quantRodadas, classificacao, idUsuario_fk, idJogador_fk) {
+async function login(usuario, senha) {
+
+    const conexao = await mysql.createConnection(banco);
+
+    const [usuarios] = await conexao.execute(
+        'SELECT idUsuario, nome, email FROM usuarios WHERE nome = ? AND senha = ?',
+        [usuario, senha]
+    );
+
+    await conexao.end();
+
+    return usuarios[0] || null;
+}
+
+
+// ================================
+// JOGADORES
+// ================================
+
+async function listarJogadores(idUsuario) {
+
+    const conexao = await mysql.createConnection(banco);
+
+    // "AS nome"/"AS vitorias" pra o front não precisar trocar nomes[i].nome, nomes[i].vitorias
+    const [jogadores] = await conexao.execute(
+        `SELECT idJogador, nomeJogador AS nome, vitoriasJogador AS vitorias
+         FROM jogadores WHERE idUsuario_fk = ?`,
+        [idUsuario]
+    );
+
+    await conexao.end();
+
+    return jogadores;
+}
+
+async function cadastrarJogador(nome, idUsuario) {
 
     const conexao = await mysql.createConnection(banco);
 
     const sql = `
-        INSERT INTO torneio
-        (nomeTorneio, quantRodadas, idUsuario_fk, nomeJogador_fk)
-        VALUES (?, ?, ?, ?)
-        
+        INSERT INTO jogadores (nomeJogador, vitoriasJogador, idUsuario_fk)
+        VALUES (?, 0, ?)
     `;
 
     await conexao.execute(sql, [
-        nomeTorneio,
-        quantRodadas,
-        idUsuario_fk,
-        idJogador_fk
+        nome,
+        idUsuario
     ]);
 
     await conexao.end();
 }
 
-async function atualizarHistorico(classificacao, idJogador_fk) {
-
-    const conexao = await mysql.createConnection(banco);
-
-    const sql = `
-        INSERT INTO torneio
-        (classificacao)
-        VALUES (?)
-    `;
-
-    await conexao.execute(sql, [
-        torneio
-    ]);
-
-    await conexao.end();
-}
-
-
-
-// ALTERAR PRODUTO
-
-async function alterarJogador(novoNome, idJogador) {
+async function alterarJogador(idJogador, novoNome) {
 
     const conexao = await mysql.createConnection(banco);
 
@@ -150,41 +134,129 @@ async function alterarJogador(novoNome, idJogador) {
     await conexao.end();
 }
 
+async function somarVitoria(idJogador) {
 
-// EXCLUIR PRODUTO
+    const conexao = await mysql.createConnection(banco);
+
+    const sql = `
+        UPDATE jogadores
+        SET vitoriasJogador = vitoriasJogador + 1
+        WHERE idJogador = ?
+    `;
+
+    await conexao.execute(sql, [idJogador]);
+
+    await conexao.end();
+}
 
 async function excluirJogador(idJogador) {
 
     const conexao = await mysql.createConnection(banco);
 
-    const sql = `
-        DELETE FROM torneio
-        where idJogador_fk = ?
-    `;
+    // precisa sair primeiro de classificacoes, senão a FK barra o DELETE de jogadores
+    // (isso significa que excluir um jogador apaga a posição dele em torneios antigos;
+    //  se quiser manter o histórico intacto, a alternativa é bloquear a exclusão nesse caso)
+    await conexao.execute(
+        'DELETE FROM classificacoes WHERE idJogador_fk = ?',
+        [idJogador]
+    );
 
-        const sql2 = `
-        DELETE FROM jogadores 
-        WHERE idJogador = ?
-    `;
-
-
-
-    await conexao.execute(sql, [id]);
-    await conexao.execute(sql2, [id]);
+    await conexao.execute(
+        'DELETE FROM jogadores WHERE idJogador = ?',
+        [idJogador]
+    );
 
     await conexao.end();
 }
 
 
+// ================================
+// TORNEIOS
+// ================================
+
+async function buscarClassificacao(idTorneio) {
+
+    const conexao = await mysql.createConnection(banco);
+
+    const [linhas] = await conexao.execute(
+        `SELECT j.nomeJogador AS nome
+         FROM classificacoes c
+         JOIN jogadores j ON j.idJogador = c.idJogador_fk
+         WHERE c.idTorneio_fk = ?
+         ORDER BY c.classificacaoNumero ASC`,
+        [idTorneio]
+    );
+
+    await conexao.end();
+
+    return linhas.map(function(linha) { return linha.nome; });
+}
+
+async function listarTorneios(idUsuario) {
+
+    const conexao = await mysql.createConnection(banco);
+
+    const [torneios] = await conexao.execute(
+        `SELECT idTorneio, nomeTorneio AS nome, quantRodadas AS numRodadas
+         FROM torneios WHERE idUsuario_fk = ?`,
+        [idUsuario]
+    );
+
+    await conexao.end();
+
+    // para cada torneio, busca a lista de nomes na ordem de classificação
+    for (let i = 0; i < torneios.length; i++) {
+        torneios[i].classificacao = await buscarClassificacao(torneios[i].idTorneio);
+    }
+
+    return torneios;
+}
+
+async function cadastrarTorneio(nomeTorneio, quantRodadas, classificacaoIds, idUsuario) {
+
+    const conexao = await mysql.createConnection(banco);
+
+    const sqlTorneio = `
+        INSERT INTO torneios (nomeTorneio, quantRodadas, idUsuario_fk)
+        VALUES (?, ?, ?)
+    `;
+
+    const [resultado] = await conexao.execute(sqlTorneio, [
+        nomeTorneio,
+        quantRodadas,
+        idUsuario
+    ]);
+
+    const idTorneio = resultado.insertId;
+
+    const sqlClassificacao = `
+        INSERT INTO classificacoes (idJogador_fk, idTorneio_fk, classificacaoNumero)
+        VALUES (?, ?, ?)
+    `;
+
+    // classificacaoIds já vem na ordem: 1º colocado primeiro, 2º depois, etc.
+    for (let i = 0; i < classificacaoIds.length; i++) {
+        await conexao.execute(sqlClassificacao, [
+            classificacaoIds[i],
+            idTorneio,
+            i + 1
+        ]);
+    }
+
+    await conexao.end();
+}
+
 
 module.exports = {
+    listarUsuarios,
+    buscarUsuarioPorEmail,
+    cadastrarUsuario,
+    login,
     listarJogadores,
     cadastrarJogador,
     alterarJogador,
+    somarVitoria,
     excluirJogador,
-    listarUsuarios,
-    cadastrarUsuario,
     listarTorneios,
-    cadastrarTorneio,
-    atualizarHistorico
+    cadastrarTorneio
 };

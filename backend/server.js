@@ -9,119 +9,181 @@ app.use(cors());
 app.use(express.json());
 
 
-// LISTAR JOGADORES E USUÁRIOS
+// ================================
+// USUÁRIOS
+// ================================
 
-app.get('/jogadores', async function(req, res) {
+// cadastro
+app.post('/usuarios', async function(req, res) {
+
+    const nome = req.body.nome;
+    const email = req.body.email;
+    const senha = req.body.senha;
 
     try {
 
-        const jogadores =
-            await DAO.listarJogadores();
+        const existente = await DAO.buscarUsuarioPorEmail(email);
+
+        if (existente) {
+            res.status(409).json({ erro: 'Este e-mail já está cadastrado' });
+            return;
+        }
+
+        const usuario = await DAO.cadastrarUsuario(nome, email, senha);
+
+        res.json(usuario);
+
+    } catch (erro) {
+
+        res.status(500).json({ erro: 'Erro ao cadastrar usuário' });
+
+    }
+
+});
+
+// login
+app.post('/login', async function(req, res) {
+
+    const usuario = req.body.usuario;
+    const senha = req.body.senha;
+
+    try {
+
+        const encontrado = await DAO.login(usuario, senha);
+
+        if (!encontrado) {
+            res.status(401).json({ erro: 'Usuário ou senha incorretos' });
+            return;
+        }
+
+        res.json(encontrado);
+
+    } catch (erro) {
+
+        res.status(500).json({ erro: 'Erro ao fazer login' });
+
+    }
+
+});
+
+
+// ================================
+// JOGADORES
+// ================================
+
+// lista só os jogadores do usuário logado: GET /jogadores?usuario=3
+app.get('/jogadores', async function(req, res) {
+
+    const idUsuario = req.query.usuario;
+
+    try {
+
+        const jogadores = await DAO.listarJogadores(idUsuario);
 
         res.json(jogadores);
 
     } catch (erro) {
 
-        res.status(500).json({
-            erro: 'Erro ao buscar Jogador'
-        });
+        res.status(500).json({ erro: 'Erro ao buscar jogadores' });
 
     }
 
 });
 
-app.get('/usuarios', async function(req, res) {
+app.post('/jogadores', async function(req, res) {
+
+    const nome = req.body.nome;
+    const idUsuario = req.body.usuario;
 
     try {
 
-        const usuarios =
-            await DAO.listarUsuarios();
+        await DAO.cadastrarJogador(nome, idUsuario);
 
-        res.json(usuarios);
+        res.json({ mensagem: 'Jogador cadastrado!' });
 
     } catch (erro) {
 
-        res.status(500).json({
-            erro: 'Erro ao buscar Usuario'
-        });
+        res.status(500).json({ erro: 'Erro ao cadastrar jogador' });
 
     }
 
 });
 
-app.get('/torneios', async function(req, res) {
+app.put('/jogadores/:id', async function(req, res) {
+
+    const idJogador = req.params.id;
+    const nome = req.body.nome;
 
     try {
 
-        const torneios =
-            await DAO.listarTorneios();
+        await DAO.alterarJogador(idJogador, nome);
+
+        res.json({ mensagem: 'Jogador alterado!' });
+
+    } catch (erro) {
+
+        res.status(500).json({ erro: 'Erro ao alterar jogador' });
+
+    }
+
+});
+
+// soma 1 vitória (chamado quando o jogador vence uma rodada final de um torneio)
+app.put('/jogadores/:id/vencer', async function(req, res) {
+
+    const idJogador = req.params.id;
+
+    try {
+
+        await DAO.somarVitoria(idJogador);
+
+        res.json({ mensagem: 'Vitória registrada!' });
+
+    } catch (erro) {
+
+        res.status(500).json({ erro: 'Erro ao registrar vitória' });
+
+    }
+
+});
+
+app.delete('/jogadores/:id', async function(req, res) {
+
+    const idJogador = req.params.id;
+
+    try {
+
+        await DAO.excluirJogador(idJogador);
+
+        res.json({ mensagem: 'Jogador excluído!' });
+
+    } catch (erro) {
+
+        res.status(500).json({ erro: 'Erro ao excluir jogador' });
+
+    }
+
+});
+
+
+// ================================
+// TORNEIOS
+// ================================
+
+// lista só os torneios do usuário logado: GET /torneios?usuario=3
+app.get('/torneios', async function(req, res) {
+
+    const idUsuario = req.query.usuario;
+
+    try {
+
+        const torneios = await DAO.listarTorneios(idUsuario);
 
         res.json(torneios);
 
     } catch (erro) {
 
-        res.status(500).json({
-            erro: 'Erro ao buscar Torneios'
-        });
-
-    }
-
-});
-
-
-// CADASTRAR JOGADOR
-
-app.post('/jogadores', async function(req, res) {
-
-    const nome = req.body.nome;
-    const usuariofk = req.body.usuario;
-
-    try {
-
-        await DAO.cadastrarJogador(
-            nome,
-            usuariofk
-        );
-
-        res.json({
-            mensagem: 'Jogador cadastrado!'
-        });
-
-    } catch (erro) {
-
-        res.status(500).json({
-            erro: 'Erro ao cadastrar Jogador'
-        });
-
-    }
-
-});
-
-app.post('/usuario', async function(req, res) {
-
-    const nome = req.body.nome;
-    const usuarioid = req.body.usuarioId
-    const senha = req.body.senha
-    const email = req.body.email
-
-    try {
-
-        await DAO.cadastrarUsuario(
-            nome,
-            usuarioid,
-            email,
-            senha
-        );
-
-        res.json({
-            mensagem: 'Usuario cadastrado!'
-        });
-
-    } catch (erro) {
-
-        res.status(500).json({
-            erro: 'Erro ao cadastrar Usuario'
-        });
+        res.status(500).json({ erro: 'Erro ao buscar torneios' });
 
     }
 
@@ -130,99 +192,31 @@ app.post('/usuario', async function(req, res) {
 app.post('/torneios', async function(req, res) {
 
     const nome = req.body.nome;
-    const usuariofk = req.body.usuario;
-    const idTorneio = req.body.torneio;
     const numRodadas = req.body.numRodadas;
     const classificacao = req.body.classificacao;
-
-
-   try {
-
-        await DAO.cadastrarTorneio(
-            nome,
-            usuariofk,
-            idTorneio,
-            numRodadas,
-            classificacao
-        );
-
-        res.json({
-            mensagem: 'Torneio criado!'
-        });
-
-    } catch (erro) {
-
-        res.status(500).json({
-            erro: 'Erro ao criar torneio'
-        });
-
-    }
-
-});
-
-
-// ALTERAR JOGADORES
-
-app.put('/jogadores/:id', async function(req, res) {
-
-    const usuariofk = req.params.id;
-    const nome = req.body.nome;
-    const idJogador = req.body.idJogador;
+    const idUsuario = req.body.usuario;
 
     try {
 
-        await DAO.alterarJogador(
-            usuariofk,
-            nome,
-            idJogador
-        );
+        await DAO.cadastrarTorneio(nome, numRodadas, classificacao, idUsuario);
 
-        res.json({
-            mensagem: 'Jogador alterado!'
-        });
+        res.json({ mensagem: 'Torneio criado!' });
 
     } catch (erro) {
 
-        res.status(500).json({
-            erro: 'Erro ao alterar jogador'
-        });
+        res.status(500).json({ erro: 'Erro ao criar torneio' });
 
     }
 
 });
 
 
-// EXCLUIR JOGADOR
-
-app.delete('/jogadores/:id', async function(req, res) {
-
-    const id = req.params.id;
-
-    try { 
-
-        await DAO.excluirJogador(id);
-
-        res.json({
-            mensagem: 'Jogador excluído!'
-        });
-
-    } catch (erro) {
-
-        res.status(500).json({
-            erro: 'Erro ao excluir jogador'
-        });
-
-    }
-
-});
-
-
+// ================================
 // INICIAR SERVIDOR
+// ================================
 
 app.listen(3000, function() {
 
-    console.log(
-        'Servidor funcionando na porta 3000'
-    );
+    console.log('Servidor funcionando na porta 3000');
 
 });
