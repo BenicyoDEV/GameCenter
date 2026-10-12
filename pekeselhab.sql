@@ -1,6 +1,12 @@
-create database pixelhub;
+-- =========================================
+-- schema.sql — banco "pixelhub"
+-- Rode isso uma vez no MySQL antes de ligar o server.js
+-- =========================================
+
+create database if not exists pixelhub;
 use pixelhub;
-create table usuario(
+
+create table usuarios(
     idUsuario int not null primary key auto_increment,
     nome varchar(50) not null,
     email varchar(50) not null unique,
@@ -12,16 +18,22 @@ create table jogadores(
     idUsuario_fk int not null,
     nomeJogador varchar(50) not null,
     vitoriasJogador int not null,
-    foreign key (idUsuario_fk) references usuario(idUsuario)
+    foreign key (idUsuario_fk) references usuarios(idUsuario)
 ) engine = InnoDB;
 
-    create table torneio(
-        idTorneio int not null primary key auto_increment,
-        idJogador_fk int not null,
-        idUsuario_fk int not null,
-        nomeTorneio varchar(100) not null,
-        quantRodadas int not null,
-        classificacao varchar(1000) not null,
-        foreign key (idJogador_fk) references jogadores(idJogador),
-        foreign key (idUsuario_fk) references usuario(idUsuario)
-    )   engine = InnoDB;
+create table torneios(
+    idTorneio int not null primary key auto_increment,
+    idUsuario_fk int not null,
+    nomeTorneio varchar(100) not null,
+    quantRodadas int not null,
+    foreign key (idUsuario_fk) references usuarios(idUsuario)
+) engine = InnoDB;
+
+create table classificacoes(
+    idClassificacao int not null primary key auto_increment,
+    idJogador_fk int not null,
+    idTorneio_fk int not null,
+    classificacaoNumero int not null,
+    foreign key (idTorneio_fk) references torneios(idTorneio),
+    foreign key (idJogador_fk) references jogadores(idJogador)
+) engine = InnoDB;
