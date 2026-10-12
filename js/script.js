@@ -1,13 +1,22 @@
 // ================================
-// DADOS / LOCALSTORAGE
+// DADOS / SERVIDOR
 // ================================
 
-let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-let nomes = JSON.parse(localStorage.getItem("nomes")) || [];
-let historicoTorneios = JSON.parse(localStorage.getItem("historicoTorneios")) || [];
-let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || [];
+// servidor Node rodando no mesmo PC (node server.js), não no navegador
+const API = 'http://localhost:3000';
+
+let usuarios = [];             // só usado no cadastro, pra checar e-mail duplicado
+let nomes = [];                // jogadores do usuário logado (vem do servidor)
+let historicoTorneios = [];    // torneios do usuário logado (vem do servidor)
+let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || null;
 
 const pagina = document.body.dataset.page;
+
+// páginas que exigem estar logado (todas, exceto login e cadastro)
+if (usuarioLogado === null && pagina !== "login" && pagina !== "cadastro")
+{
+    window.location.href = '../index.html';
+}
 
 // ================================
 // CADASTRO
@@ -22,7 +31,7 @@ if (pagina === "cadastro")
     input.type = input.type === 'password' ? 'text' : 'password';
   }
 
-  function validarCadastro(event) {
+  async function validarCadastro(event) {
     event.preventDefault();
 
     try {
@@ -33,13 +42,19 @@ if (pagina === "cadastro")
       if (nome.length < 3) throw new Error("O usuário precisa ter pelo menos 3 caracteres.");
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Digite um e-mail válido.");
       if (senha.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
-      if (usuarios.some(usuario => usuario.email === email)) throw new Error("Este e-mail já está cadastrado.");
 
- usuarios.push({ usuario: nome, email: email, senha: senha });
- localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      const resposta = await fetch(`${API}/usuarios`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome: nome, email: email, senha: senha })
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) throw new Error(dados.erro || "Não foi possível cadastrar.");
 
       areaErro.textContent = '';
-      usuarioLogado = usuarios.at(-1);
+      usuarioLogado = dados; // { idUsuario, nome, email }
       localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
       window.location.href = 'menuprincipal.html';
 
@@ -70,11 +85,9 @@ if (pagina === "login")
   const areaErro = document.getElementById("areaErro");
 
 
-  formLogar.addEventListener('submit', function(event){
+  formLogar.addEventListener('submit', async function(event){
 
     event.preventDefault();
-
-
 
     try {
       const inUsuario = document.getElementById("inUsuario").value.trim();
@@ -83,26 +96,18 @@ if (pagina === "login")
       if (inUsuario === '') throw new Error("Digite seu usuário.");
       if (inSenha === '') throw new Error("Digite sua senha.");
 
-let usuarioEncontrado = false;
-let indiceEncontrado = -1;
+      const resposta = await fetch(`${API}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario: inUsuario, senha: inSenha })
+      });
 
-for (let i = 0; i < usuarios.length; i++)
-{
-    if (inUsuario === usuarios[i].usuario && inSenha === usuarios[i].senha)
-    {
-        usuarioEncontrado = true;
-        indiceEncontrado = i;
-        break;
-    }
-}
+      const dados = await resposta.json();
 
-if (!usuarioEncontrado)
-{
-    throw new Error("Usuário ou senha incorretos.");
-}
+      if (!resposta.ok) throw new Error(dados.erro || "Usuário ou senha incorretos.");
 
       areaErro.textContent = '';
-      usuarioLogado = usuarios[indiceEncontrado];
+      usuarioLogado = dados; // { idUsuario, nome, email }
       localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
       window.location.href = "pages/menuprincipal.html";
 
@@ -122,8 +127,10 @@ if (!usuarioEncontrado)
 // ================================
 if (pagina === "gerenciarjogadores")
 {
+      const idUsuario = usuarioLogado.idUsuario;
+
       const letraUserGe = document.getElementById('letraUserGe');
-    let letraPassada = usuarioLogado.usuario;
+    let letraPassada = usuarioLogado.nome;
     letraPassada = letraPassada[0];
     letraUserGe.innerHTML = `${letraPassada}`;
 
@@ -162,7 +169,7 @@ if (pagina === "gerenciarjogadores")
  
       const editarJogador = document.getElementById('editarJogador');
  
-      formulario.addEventListener('submit', function(event) {
+      formulario.addEventListener('submit', async function(event) {
  
       event.preventDefault(); // Impede o recarregamento da página
  
@@ -192,15 +199,13 @@ if (pagina === "gerenciarjogadores")
       }
  
       try {
-          
-          nomes.push(
-      {
-          nome: nomeJogador,
-          vitorias: 0
-      }
-          );
-       localStorage.setItem("nomes", JSON.stringify(nomes));
-       //salva o nome do jogador no array.
+
+          await fetch(`${API}/jogadores`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nome: nomeJogador, usuario: idUsuario })
+          });
+          //salva o nome do jogador no banco
   } catch (erro) {
         areaErro.innerHTML = `<p>Não foi possivel cadastrar o jogador.</p>
                               <button id="fecharErro">Fechar</button>`;
@@ -211,13 +216,25 @@ if (pagina === "gerenciarjogadores")
  
  
  
-      CarregarTabela();
+      await CarregarTabela();
       formulario.reset();
     });
  
  
-    function CarregarTabela() {
-        
+    async function CarregarTabela() {
+
+      try {
+          const resposta = await fetch(`${API}/jogadores?usuario=${idUsuario}`);
+          nomes = await resposta.json();
+      } catch (erro) {
+          areaErro.innerHTML = `<p>Não foi possivel carregar os jogadores.</p>
+                                <button id="fecharErro">Fechar</button>`;
+          document.getElementById("fecharErro").addEventListener("click", function() {
+          areaErro.innerHTML = '';
+          });
+          nomes = [];
+      }
+
         lista.innerHTML = '';
       let soma = 0;
       for (i =0; i<nomes.length; i++)
@@ -376,10 +393,9 @@ linha.addEventListener('dblclick', function() {
 
 
  
-          botaoExcluir.addEventListener('click', function(){
+          botaoExcluir.addEventListener('click', async function(){
                     try {
-         nomes.splice(indice, 1);
-         localStorage.setItem("nomes", JSON.stringify(nomes));
+         await fetch(`${API}/jogadores/${nomes[indice].idJogador}`, { method: 'DELETE' });
   } catch (erro) {
         areaErro.innerHTML = `<p>Não foi possivel remover o jogador.</p>
                               <button id="fecharErro">Fechar</button>`;
@@ -423,7 +439,7 @@ linha.addEventListener('dblclick', function() {
  
             let confirmarAlteracoes = document.getElementById("confirmarAlteracoes")
  
-            formularioAlteracoes.addEventListener('submit', function(event) {
+            formularioAlteracoes.addEventListener('submit', async function(event) {
               event.preventDefault();
  
               let inputNovoNome = document.getElementById("novoNomeJogador").value.trim();
@@ -453,8 +469,11 @@ linha.addEventListener('dblclick', function() {
       }
  
           try {
-          nomes[indice].nome = inputNovoNome;
-          localStorage.setItem("nomes", JSON.stringify(nomes));
+          await fetch(`${API}/jogadores/${nomes[indice].idJogador}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nome: inputNovoNome })
+          });
   } catch (erro) {
         areaErro.innerHTML = `<p>Não foi possivel editar o jogador.</p>
                               <button id="fecharErro">Fechar</button>`;
@@ -496,8 +515,10 @@ CarregarTabela();
 // ================================
 if (pagina === "criartorneio")
 {
+      const idUsuario = usuarioLogado.idUsuario;
+
       const letraUserCr = document.getElementById('letraUserCr');
-    let letraPassada = usuarioLogado.usuario;
+    let letraPassada = usuarioLogado.nome;
     letraPassada = letraPassada[0];
     letraUserCr.innerHTML = `${letraPassada}`;
 
@@ -718,7 +739,7 @@ if (pagina === "criartorneio")
     }
 
 
-    function Torneio() {
+    async function Torneio() {
 
       if (jogselecionados.length != 1)
       {
@@ -797,29 +818,56 @@ if (pagina === "criartorneio")
           <br><br><br>
         `;
 
-        for (i = 0; i<nomes.length; i++)
+        const jogadorVencedor = nomes.find(function(jogador) {
+          return jogador.nome === jogselecionados[0];
+        });
+
+        if (jogadorVencedor)
         {
-          if (nomes[i].nome === jogselecionados[0])
-          {
-            nomes[i].vitorias++;
-            localStorage.setItem("nomes", JSON.stringify(nomes));
-            console.log(nomes[i].vitorias);
+          try {
+            await fetch(`${API}/jogadores/${jogadorVencedor.idJogador}/vencer`, { method: 'PUT' });
+          } catch (erro) {
+            areaErro3.innerHTML = `<p>Não foi possivel registrar a vitória.</p>
+                                  <button id="fecharErro">Fechar</button>`;
+            document.getElementById("fecharErro").addEventListener("click", function() {
+              areaErro3.innerHTML = '';
+            });
           }
         }
 
 
-        document.getElementById("novoTorneio").addEventListener("click", function() {
+        document.getElementById("novoTorneio").addEventListener("click", async function() {
 
           let nomeAtribuido = document.getElementById('nomtor').value.trim();
 
           classificacaoAtual.unshift(jogselecionados[0]);
-          historicoTorneios.push({
-            nome: nomeAtribuido,
-            numRodadas: numeroRodada-1,
-            classificacao: classificacaoAtual
-          });
-           localStorage.setItem("historicoTorneios", JSON.stringify(historicoTorneios));
 
+          // classificacaoAtual tem os NOMES, na ordem do 1º ao último colocado;
+          // o banco guarda por idJogador (tabela classificacoes), então convertemos aqui
+          const classificacaoIds = classificacaoAtual.map(function(nomeJog) {
+            const jogador = nomes.find(function(j) { return j.nome === nomeJog; });
+            return jogador ? jogador.idJogador : null;
+          });
+
+          try {
+            await fetch(`${API}/torneios`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  nome: nomeAtribuido,
+                  numRodadas: numeroRodada - 1,
+                  classificacao: classificacaoIds,
+                  usuario: idUsuario
+                })
+            });
+          } catch (erro) {
+            areaErro3.innerHTML = `<p>Não foi possivel salvar o torneio.</p>
+                                  <button id="fecharErro">Fechar</button>`;
+            document.getElementById("fecharErro").addEventListener("click", function() {
+              areaErro3.innerHTML = '';
+            });
+            return;
+          }
 
           location.reload();
 
@@ -835,7 +883,22 @@ if (pagina === "criartorneio")
       window.location.href = 'menuprincipal.html';
     }
 
-    CriarTorneio();
+    // busca os jogadores do usuário no servidor antes de montar a tela
+    (async function iniciarCriarTorneio() {
+      try {
+        const resposta = await fetch(`${API}/jogadores?usuario=${idUsuario}`);
+        nomes = await resposta.json();
+      } catch (erro) {
+        areaErro2.innerHTML = `<p>Não foi possivel carregar os jogadores.</p>
+                              <button id="fecharErro">Fechar</button>`;
+        document.getElementById("fecharErro").addEventListener("click", function() {
+          areaErro2.innerHTML = '';
+        });
+        nomes = [];
+      }
+
+      CriarTorneio();
+    })();
 
 }
 // ================================
@@ -843,8 +906,10 @@ if (pagina === "criartorneio")
 // ================================
 if (pagina === "historicotorneios")
 {
+      const idUsuario = usuarioLogado.idUsuario;
+
       const letraUserHi = document.getElementById('letraUserHi');
-    let letraPassada = usuarioLogado.usuario;
+    let letraPassada = usuarioLogado.nome;
     letraPassada = letraPassada[0];
     letraUserHi.innerHTML = `${letraPassada}`;
 
@@ -852,7 +917,14 @@ if (pagina === "historicotorneios")
 
 
 
-    function CarregarHistorico() {
+    async function CarregarHistorico() {
+
+      try {
+          const resposta = await fetch(`${API}/torneios?usuario=${idUsuario}`);
+          historicoTorneios = await resposta.json();
+      } catch (erro) {
+          historicoTorneios = [];
+      }
 
       if (historicoTorneios.length == 0)
       {
@@ -948,14 +1020,23 @@ if (pagina === "historicotorneios")
 // ================================
 if (pagina === "menuprincipal")
 {
+    const idUsuario = usuarioLogado.idUsuario;
+
     const letraUserMe = document.getElementById('letraUserMe');
-    let letraPassada = usuarioLogado.usuario;
+    let letraPassada = usuarioLogado.nome;
     letraPassada = letraPassada[0];
     letraUserMe.innerHTML = `${letraPassada}`;
 
-    function CarregarHistorico() {
+    async function CarregarHistorico() {
 
         const torneios = document.getElementById("torneio");
+
+        try {
+            const resposta = await fetch(`${API}/torneios?usuario=${idUsuario}`);
+            historicoTorneios = await resposta.json();
+        } catch (erro) {
+            historicoTorneios = [];
+        }
 
         torneios.innerHTML = '';
 
