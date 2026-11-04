@@ -65,6 +65,7 @@ if (pagina === "cadastro")
     return false;
   }
 
+  document.querySelector('form').addEventListener('submit', validarCadastro);
   document.querySelector('form').addEventListener('input', function() {
     areaErro.textContent = '';
   });
