@@ -3,7 +3,7 @@
 // ================================
 
 // servidor Node rodando no mesmo PC (node server.js), não no navegador
-const API = 'http://localhost:3000';
+const API = 'https://pixelhub-q815.onrender.com';
 
 let usuarios = [];             // só usado no cadastro, pra checar e-mail duplicado
 let nomes = [];                // jogadores do usuário logado (vem do servidor)
