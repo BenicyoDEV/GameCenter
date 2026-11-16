@@ -1,0 +1,8 @@
+(na pasta backend)
+
+npm init -y && npm install express mysql2 cors dotenv
+
+feijao com farinha
+
+node server.js
+
