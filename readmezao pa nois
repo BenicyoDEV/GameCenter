@@ -2,7 +2,7 @@
 
 **📅 Data de produção:** Setembro de 2026
 
-Projeto acadêmico que apresenta um sistema web para **cadastro de jogadores e organização de torneios**, com login de usuário, gerenciamento completo de participantes e histórico de competições.
+Projeto acadêmico que apresenta um sistema web para **cadastro de jogadores e organização de torneios**, com login de usuário, gerenciamento completo de participantes e histórico de competições. O sistema conta com armazenamento em banco de dados e uma API hospedada em servidor online, permitindo o acesso e a persistência dos dados.
 
 ---
 
@@ -16,6 +16,7 @@ O site inclui:
 - Criação de torneios com seleção de participantes e acompanhamento de rodadas
 - Histórico com os torneios já finalizados
 - Painel com estatísticas gerais (quantidade de jogadores, vitórias, médias, etc.)
+- **Armazenamento online** dos dados dos usuários, jogadores e torneios
 - **Responsividade completa** com uso de *media queries* para celulares
 
 ---
@@ -32,9 +33,19 @@ O site inclui:
 
 ## 🗄️ Armazenamento de Dados
 
-Atualmente, todos os dados do sistema (usuários, jogadores, torneios e histórico) são salvos através do **localStorage do navegador**, sem a necessidade de um banco de dados ou servidor externo. Isso permite testar o sistema completo apenas abrindo o site, sem nenhuma configuração adicional.
+Diferentemente da versão inicial, que utilizava exclusivamente o **localStorage do navegador**, o sistema atualmente conta com um **banco de dados TiDB** e um servidor online hospedado na plataforma **Render**.
 
-O projeto foi estruturado de forma que essa camada de armazenamento possa futuramente ser substituída por uma **hospedagem em servidor com banco de dados**, mantendo a mesma lógica de funcionamento.
+O backend foi desenvolvido com **Node.js e Express**, disponibilizando uma API responsável pela comunicação entre o site e o banco de dados. As operações de cadastro, consulta, edição e exclusão são realizadas por meio de requisições HTTP.
+
+Os dados são organizados em tabelas relacionais:
+- **Usuários:** armazenamento das informações das contas cadastradas.
+- **Jogadores:** armazenamento dos jogadores e suas respectivas quantidades de vitórias, associados aos usuários.
+- **Torneios:** armazenamento dos torneios criados e suas informações.
+- **Classificações:** registro da posição de cada jogador nos torneios finalizados.
+
+O **localStorage** continua sendo utilizado apenas para armazenar as informações básicas do usuário logado no navegador. Os dados principais do sistema são persistidos no TiDB, permitindo que permaneçam disponíveis mesmo após fechar ou acessar o site em outro momento.
+
+A conexão com o banco de dados é realizada pelo pacote **mysql2**, utilizando variáveis de ambiente para as credenciais e conexão segura por SSL/TLS.
 
 ---
 
@@ -45,16 +56,29 @@ O projeto foi estruturado de forma que essa camada de armazenamento possa futura
 | **HTML5** | Estruturação das páginas |
 | **CSS3** | Estilizações, responsividade e efeitos visuais |
 | **JavaScript** | Lógica do sistema, validações e manipulação da interface |
-| **localStorage** | Armazenamento local dos dados (usuários, jogadores e torneios) |
+| **Node.js** | Execução do backend e gerenciamento do servidor |
+| **Express** | Criação da API e gerenciamento das rotas e requisições HTTP |
+| **MySQL2** | Comunicação entre o servidor e o banco de dados |
+| **TiDB** | Banco de dados relacional para armazenamento dos usuários, jogadores e torneios |
+| **Render** | Hospedagem do servidor e disponibilização da API online |
+| **localStorage** | Armazenamento local das informações básicas do usuário logado |
+| **dotenv** | Gerenciamento das variáveis de ambiente utilizadas na conexão com o banco |
 
 ---
 
 ## 👥 Integrantes do Projeto
 
+Todos os integrantes participaram do desenvolvimento inicial do projeto, implementando sua primeira versão com armazenamento em localStorage.
+
+**Desenvolvimento da versão inicial:**
 - **[@BenicyoDEV](https://github.com/BenicyoDEV)**
 - **[@arthurleon44](https://github.com/arthurleon44)**
-- **[@alicercedev]((https://github.com/alicercedev))**
-- **[@gabrielmaximianomax-svg]((https://github.com/gabrielmaximianomax-svg))**
+- **[@alicercedev](https://github.com/alicercedev)**
+- **[@gabrielmaximianomax-svg](https://github.com/gabrielmaximianomax-svg)**
+
+**Implementação da versão online (TiDB e Render):**
+- **[@BenicyoDEV](https://github.com/BenicyoDEV)**
+- **[@alicercedev](https://github.com/alicercedev)**
 
 ---
 
