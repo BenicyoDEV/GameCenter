@@ -2,12 +2,12 @@
 // DADOS / SERVIDOR
 // ================================
 
-// servidor Node rodando no mesmo PC (node server.js), não no navegador
+
 const API = 'https://pixelhub-q815.onrender.com';
 
-let usuarios = [];             // só usado no cadastro, pra checar e-mail duplicado
-let nomes = [];                // jogadores do usuário logado (vem do servidor)
-let historicoTorneios = [];    // torneios do usuário logado (vem do servidor)
+let usuarios = []; 
+let nomes = [];        
+let historicoTorneios = [];
 let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || null;
 
 const pagina = document.body.dataset.page;
